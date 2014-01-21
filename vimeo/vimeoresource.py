@@ -21,12 +21,14 @@ import os
 from urllib import urlencode
 import logging as log
 import base64
+from functools import partial
 
 from tornado.httpclient import AsyncHTTPClient, HTTPClient
 import tornado
 import tornado.gen
 
 import resources
+import vimeoresponse
 
 log.basicConfig(level=log.WARNING)
 
@@ -349,7 +351,8 @@ class VimeoResource(object):
         ret = {'headers': headers}
         if body:
             ret['body'] = json.loads(body)
-        return ret
+
+        return vimeoresponse.VimeoResponse(self, ret)
 
     def _cat_url_path(self, urlpath):
         """
