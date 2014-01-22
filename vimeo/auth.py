@@ -104,3 +104,34 @@ def get_access_token(auth_code, api_root, cid, secret, redirect, dev=False):
         raise ValueError(response.error)
     else:
         return json.loads(response.body)['access_token']
+
+def get_client_credentials(client_id, client_secret, scopes=None, api_root='https://api.vimeo.com'):
+    """
+    Generates a bearer token for the registered application.
+
+    This token will exist without a user context, but will allow for access to data in the API.
+
+    Args:
+    client_id     - The client ID for the current app
+    client_secret - The client secret for the current app
+    scopes        - A list of permission scopes that the user will be prompted to allow
+    api_root      - The root url of the API being used (in VimeoClient, accessible via
+                  config['apiroot'])
+    """
+    basic_auth = base64.b64encode("%s:%s" % (client_id, client_secret))
+    payload = {"grant_type": "client_credentials"}
+    headers = {"Accept": "application/vnd.vimeo.*+json; version=3.0",
+            "Authorization": "Basic %s" % basic_auth}
+
+    if scopes:
+        payload['scope'] = scopes
+
+    response = HTTPClient().fetch("%s/oauth/authorize/client" % api_root,
+                          method="POST",
+                          headers=headers,
+                          body=urllib.urlencode(payload))
+
+    if response.error:
+        raise ValueError(response.error)
+
+    return json.loads(response.body)['access_token']
