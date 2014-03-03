@@ -4,18 +4,6 @@ an idiomatic interface familiar to python programmers. It also
 provides scripts and convenience functions that help navigate authentication,
 automate uploads, and more.
 
-Installation
-------------
-
-python-vimeo is available on PyPI, so you can use pip to install it
-
-    pip install vimeo
-
-You can also clone this repository and install manually with
-
-    git clone https://github.vimeows.com/emmett/python-vimeo.git
-    python setup.py install
-
 Usage
 -----
 
