@@ -106,7 +106,7 @@ class Uploader():
                 body=urlencode({'type': 'streaming'}), headers = self.standard_headers,
                 validate_cert=not self.config['dev'])
         response = json.loads(r.body)
-        return response['ticket_id'], response['upload_uri_secure'], response['complete_uri']
+        return response['ticket_id'], response['upload_link_secure'], response['complete_uri']
 
     def upload_segment(self, upload_uri, _range, data, filetype):
         """
