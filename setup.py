@@ -22,9 +22,9 @@ from distutils.core import setup
 setup(name='vimeo',
       version='1.0',
       description="Python library for the Vimeo API v3",
-      author="Emmett Butler",
-      author_email="emmett@vimeo.com",
-      url="https://api.vimeo.com/",
+      author="Vimeo Staff",
+      author_email="support@vimeo.com",
+      url="https://developer.vimeo.com/",
       packages=['vimeo'],
       requires=['tornado'],
       )
