@@ -2,3 +2,4 @@ tornado
 pytest
 requests
 distutils
+python-cjson

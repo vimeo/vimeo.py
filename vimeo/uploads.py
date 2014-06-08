@@ -17,7 +17,7 @@ specific language governing permissions and limitations
 under the license.
 """
 import logging as log
-import json
+import cjson
 from urllib import urlencode
 
 from tornado.httpclient import HTTPClient, HTTPError
@@ -105,7 +105,7 @@ class Uploader():
         r = HTTPClient().fetch(self.config['apiroot'] + self.ticket_path, method="POST",
                 body=urlencode({'type': 'streaming'}), headers = self.standard_headers,
                 validate_cert=not self.config['dev'])
-        response = json.loads(r.body)
+        response = cjson.decode(r.body)
         return response['ticket_id'], response['upload_link_secure'], response['complete_uri']
 
     def upload_segment(self, upload_uri, _range, data, filetype):
