@@ -19,7 +19,7 @@ under the license.
 
 import urllib
 import base64
-import cjson
+import json
 from copy import copy
 
 from tornado.httpclient import HTTPClient
@@ -103,7 +103,7 @@ def get_access_token(auth_code, api_root, cid, secret, redirect, dev=False):
     if response.error:
         raise ValueError(response.error)
     else:
-        return cjson.decode(response.body)['access_token']
+        return json.loads(response.body)['access_token']
 
 def get_client_credentials(client_id, client_secret, scopes=None, api_root='https://api.vimeo.com'):
     """
@@ -134,4 +134,4 @@ def get_client_credentials(client_id, client_secret, scopes=None, api_root='http
     if response.error:
         raise ValueError(response.error)
 
-    return cjson.decode(response.body)['access_token']
+    return json.loads(response.body)['access_token']

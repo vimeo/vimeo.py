@@ -16,7 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import cjson
+import json
 import os
 from urllib import urlencode
 import logging as log
@@ -350,7 +350,7 @@ class VimeoResource(object):
         """
         ret = {'headers': headers}
         if body:
-            ret['body'] = cjson.decode(body)
+            ret['body'] = json.loads(body)
 
         return vimeoresponse.VimeoResponse(self, ret)
 
@@ -738,7 +738,7 @@ class PutMultiResourceEditor(PutResourceEditor):
     """
     def putmulti(self, data, _callback=None):
         extra_headers = {"Content-Type": "application/json"}
-        self._request_path(self.config, body=cjson.encode(data), _callback=_callback, async=async,
+        self._request_path(self.config, body=json.dumps(data), _callback=_callback, async=async,
                 method="PUT", extra_headers=extra_headers)
 
 
