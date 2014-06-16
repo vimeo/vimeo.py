@@ -16,7 +16,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the license.
 """
-from vimeoresource import VimeoResource, CallableVimeoResource, SingularResource
+from vimeoresource import VimeoResource, CallableVimeoResource, \
+    SingularResource
 
 
 """
@@ -44,41 +45,40 @@ class User(SingularResource):
         super(User, self).__init__(name, path, config, properties)
         self.accept = 'person'
         self.merge_properties({
-            'activities' : {'methods': ["GET"]},
-            'albums'     : {'methods': ["GET"],
-                            'accept': 'album'},
+            'activities': {'methods': ["GET"]},
+            'albums': {'methods': ["GET"],
+                       'accept': 'album'},
             'appearances': {'methods': ["GET"]},
-            'channels'   : {'methods': ["GET", "PUT", "DELETE"],
-                            'accept': 'channel'},
-            'groups'     : {'methods': ["GET", "PUT", "DELETE"],
-                            'accept': 'group',
-                            'search': False},
-            'feed'       : {'methods': ["GET"]},
-            'followers'  : {'methods': ["GET"],
-                            'search': False,
-                            'accept': 'user'},
-            'following'  : {'methods': ["GET", "PUT", "DELETE"],
-                            'accept': 'user',
-                            'search': False},
-            'likes'      : {'methods': ["GET", "PUT", "DELETE"],
-                            'search': False,
-                            'accept': 'video'},
-            'portfolios' : {'methods': ["GET"],
-                            'accept': 'portfolio',
-                            'subresources': {
-                                'videos': {
-                                    'methods': ['GET'],
-                                    'resource': True}
-                                }},
-            'presets'    : {'methods': ["GET"],
-                            'single_get': True,
-                            'accept': 'presets'},
-            'videos'     : {'methods': ["GET", "POST"],
-                            'accept': 'video'},
-            'watchlater' : {'methods': ["GET", "PUT", "DELETE"],
-                            'accept': 'video',
-                            'multi_put': True,
-                            'search': False}  # off due to a 500 error
+            'channels': {'methods': ["GET", "PUT", "DELETE"],
+                         'accept': 'channel'},
+            'groups': {'methods': ["GET", "PUT", "DELETE"],
+                       'accept': 'group',
+                       'search': False},
+            'feed': {'methods': ["GET"]},
+            'followers': {'methods': ["GET"],
+                          'search': False,
+                          'accept': 'user'},
+            'following': {'methods': ["GET", "PUT", "DELETE"],
+                          'accept': 'user',
+                          'search': False},
+            'likes': {'methods': ["GET", "PUT", "DELETE"],
+                      'search': False,
+                      'accept': 'video'},
+            'portfolios': {'methods': ["GET"],
+                           'accept': 'portfolio',
+                           'subresources': {
+                           'videos': {'methods': ['GET'],
+                                      'resource': True}}
+                           },
+            'presets': {'methods': ["GET"],
+                        'single_get': True,
+                        'accept': 'presets'},
+            'videos': {'methods': ["GET", "POST"],
+                       'accept': 'video'},
+            'watchlater': {'methods': ["GET", "PUT", "DELETE"],
+                           'accept': 'video',
+                           'multi_put': True,
+                           'search': False}  # off due to a 500 error
         })
 
 
@@ -114,13 +114,13 @@ class Category(SingularResource):
         self.merge_properties({
             'channels': {'methods': ["GET"],
                          'accept': 'channel'},
-            'groups'  : {'methods': ["GET"],
-                         'accept': 'group'},
-            'tags'    : {'methods': ["GET"]},
-            'users'   : {'methods': ["GET"],
-                         'accept': 'user'},
-            'videos'  : {'methods': ["GET"],
-                         'accept': 'video'}
+            'groups': {'methods': ["GET"],
+                       'accept': 'group'},
+            'tags': {'methods': ["GET"]},
+            'users': {'methods': ["GET"],
+                      'accept': 'user'},
+            'videos': {'methods': ["GET"],
+                       'accept': 'video'}
         })
 
 
@@ -138,10 +138,10 @@ class Channel(SingularResource):
         self.accept = 'channel'
         self.methods = ["GET", "PATCH", "DELETE"]
         self.merge_properties({
-            'users' : {'methods': ["GET"],
-                       'accept': 'user',
-                       'filter': False,
-                       'search': False},
+            'users': {'methods': ["GET"],
+                      'accept': 'user',
+                      'filter': False,
+                      'search': False},
             'videos': {'methods': ["GET", "PUT", "DELETE"],
                        'accept': 'video',
                        'search': False}  # off due to a 500 error
@@ -162,8 +162,8 @@ class Group(SingularResource):
         self.accept = 'group'
         self.methods = ["GET", "PATCH", "DELETE"]
         self.merge_properties({
-            'users' : {'methods': ["GET"],
-                       'accept': 'user'},
+            'users': {'methods': ["GET"],
+                      'accept': 'user'},
             'videos': {'methods': ["GET", "PUT", "DELETE"],
                        'accept': 'video'}
         })
@@ -201,18 +201,19 @@ class Video(SingularResource):
         self.accept = 'video'
         self.methods = ["GET", "PATCH", "DELETE"]
         self.merge_properties({
-                'comments': {'methods': ["GET", "POST", "PATCH", "DELETE"],
-                             'accept': 'comment'},
-                'credits' : {'methods': ["GET", "POST", "DELETE"],
-                            'accept': 'credit'},
-                'likes'   : {'methods': ["GET"]},
-                'presets' : {'methods': ["GET", "PUT", "DELETE"]},
-                'tags'    : {'methods': ["GET", "PUT", "DELETE"],
-                             'accept': 'tag',
-                             'multi_put': True},
-                'stats'   : {'methods': ["GET"],
-                             'accept': 'stats'},
-        })
+                              'comments': {'methods': ["GET", "POST",
+                                                       "PATCH", "DELETE"],
+                                           'accept': 'comment'},
+                              'credits': {'methods': ["GET", "POST", "DELETE"],
+                                          'accept': 'credit'},
+                              'likes': {'methods': ["GET"]},
+                              'presets': {'methods': ["GET", "PUT", "DELETE"]},
+                              'tags': {'methods': ["GET", "PUT", "DELETE"],
+                                       'accept': 'tag',
+                                       'multi_put': True},
+                              'stats': {'methods': ["GET"],
+                                        'accept': 'stats'},
+                              })
 
 mapper = {
     "users": Users,

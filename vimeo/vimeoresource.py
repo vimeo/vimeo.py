@@ -32,12 +32,14 @@ import vimeoresponse
 
 log.basicConfig(level=log.WARNING)
 
+
 def async(func):
     @tornado.gen.coroutine
     def inner(*args, **kwargs):
         log.info("Async call arguments were: %s, %s" % (args, kwargs))
         raise tornado.gen.Return(func(*args, **kwargs))
     return inner
+
 
 class VimeoResource(object):
     """
@@ -72,8 +74,8 @@ class VimeoResource(object):
     def __getattr__(self, name):
         """
         Get a "singular" version of this resource type (SingularResource)
-        For example, if this is a Users object, __getattr__ accepts the identifier
-        of a specific user. This allows calls like
+        For example, if this is a Users object, __getattr__ accepts the
+        identifier of a specific user. This allows calls like
 
             vimeo.users.emmett9001()
 
@@ -81,9 +83,10 @@ class VimeoResource(object):
 
             vimeo.users.1234567()
 
-        is a python syntax error since it starts with a number. To get around this,
-        we first check if the literal name is valid with the API. If not, we strip
-        special marker characters and retry. This allows the above call to be made as
+        is a python syntax error since it starts with a number. To get
+        around this, we first check if the literal name is valid with
+        the API. If not, we strip special marker characters and retry.
+        This allows the above call to be made as
 
             vimeo.users.u1234567()
         or
@@ -96,19 +99,27 @@ class VimeoResource(object):
         # special case for POST requests
         if name == 'post':
             def _do_post(data, _callback=None):
-                return self._request_path(self.config, querys=data, method="POST", async=async, _callback=_callback)
+                return self._request_path(self.config,
+                                          querys=data,
+                                          method="POST",
+                                          async=async,
+                                          _callback=_callback)
             return _do_post
 
         # the normal cases, in which we're getting a subresource
         try:
             # perform an API call to see if the resource exists at `name`
-            #self._singular(name, self._urlpath, self.config, properties=self.properties)()
+            # self._singular(name, self._urlpath, self.config,
+            # properties=self.properties)()
             pass
         except:
             # if not, strip our special characters
             name = name.strip("eucgvpa")
         name = name.split('/')[-1]
-        return self._singular(name, self._urlpath, self.config, properties=self.properties)
+        return self._singular(name,
+                              self._urlpath,
+                              self.config,
+                              properties=self.properties)
 
     def __str__(self):
         """
@@ -130,15 +141,17 @@ class VimeoResource(object):
         content_filter
         page, per_page
 
-        Certain SingularResource instances may or may not have search, filter, or sort
-        capabilities. These differences, if present, are handled in SingularResource
+        Certain SingularResource instances may or may not have search,
+        filter, or sort capabilities. These differences, if present,
+        are handled in SingularResource
 
         Args:
         query (String)          -- The search query
         query_fields (String)   -- The field to query against while searching
         _filter (String)        -- The filter query
         sort (String)           -- The sort key for returned results
-        reverse (Boolean)       -- If True, requests are made with descending sort
+        reverse (Boolean)       -- If True, requests are made with descending
+                                   sort
         content_filter (String) -- The content filtering level
         page (Number)           -- The page of data to return
         per_page (Number)       -- The page size to return
@@ -174,8 +187,16 @@ class VimeoResource(object):
         """
         return getattr(self, identifier)
 
-    def _request_path(self, config, _callback=None, async=False, method="GET", endpoint='', body=None, querys={},
-                      url_override='', extra_headers={}):
+    def _request_path(self,
+                      config,
+                      _callback=None,
+                      async=False,
+                      method="GET",
+                      endpoint='',
+                      body=None,
+                      querys={},
+                      url_override='',
+                      extra_headers={}):
         """
         Make a request to the Vimeo API
 
@@ -188,8 +209,8 @@ class VimeoResource(object):
         results in a call to this method.
 
         Can be synchronous or asynchronous (with a callback or as a coroutine).
-        If a callback is used, it should accept two parameters: the response JSON
-        as a dictionary, and the request error if any. For example:
+        If a callback is used, it should accept two parameters: the response
+        JSON as a dictionary, and the request error if any. For example:
 
             def handle_response(response, error):
                 if not error:
@@ -197,29 +218,34 @@ class VimeoResource(object):
                 else:
                     raise ValueError(error.text)
 
-        If a callback argument is not specified, the request made *will* be blocking
+        If a callback argument is not specified, the request made *will* be
+        blocking
 
         Args:
         config (Dict)   -- The global configuration dictionary
 
         Kwargs:
-        _callback (Function)    -- If specified, an asynchronous request is performed
-        async (Boolean)         -- If True, the result will be returned to the top
-                                   level caller inside of a Future
+        _callback (Function)    -- If specified, an asynchronous request is
+                                   performed
+        async (Boolean)         -- If True, the result will be returned to
+                                   the top level caller inside of a Future
         method (String)         -- The HTTP method to use in the request
-        endpoint (String)       -- Used in combination with self._urlpath to build path
-                                   Also indexes into the subclass' properties dictionary
+        endpoint (String)       -- Used in combination with self._urlpath
+                                   to build path. Also indexes into the
+                                   subclass' properties dictionary
         body (String)           -- The request body
         querys (Dict)           -- The querystring arguments to send
-        url_override(String)    -- Completely overrides the path set by endpoint.
-                                   Currently only used for the /me endpoint
+        url_override(String)    -- Completely overrides the path set by
+                                   endpoint. Currently only used for the
+                                   /me endpoint
         extra_headers(Dict)     -- A dictionary of HTTP headers that will be
-                                   used in addition to the headers provided by this
-                                   library
+                                   used in addition to the headers provided
+                                   by this library
         """
         accept = "*"
         if hasattr(self, 'properties'):
-            if endpoint in self.properties and 'accept' in self.properties[endpoint]:
+            if endpoint in self.properties and 'accept' in \
+               self.properties[endpoint]:
                 accept = self.properties[endpoint]['accept']
         elif hasattr(self, 'accept'):
             accept = self.accept
@@ -238,10 +264,12 @@ class VimeoResource(object):
         # otherwise, concatenate the existing urlpath and the given endpoint
         # to create the request URL
         else:
-            url = "%s%s/%s" % (config['apiroot'], self._urlpath, endpoint.split('/')[-1])
+            url = "%s%s/%s" % (config['apiroot'],
+                               self._urlpath,
+                               endpoint.split('/')[-1])
         url = self._append_querystring(url, querys)
 
-        url,headers = self._set_auth_markers(url, headers)
+        url, headers = self._set_auth_markers(url, headers)
         # add additional headers to the request if they were given
         headers = dict(headers.items() + extra_headers.items())
 
@@ -252,14 +280,19 @@ class VimeoResource(object):
         # fork for an asynchronous or synchronous request
         if _callback and not async:
             def __callback(response):
-                result = self._parse_response_body(response.body, headers=response.headers)
+                result = self._parse_response_body(response.body,
+                                                   headers=response.headers)
                 _callback(result, response.error)
                 self._end_request_handler(result, response.error)
 
             AsyncHTTPClient().fetch(url,
-                __callback, method=method, headers=headers,
-                validate_cert=not self.config['dev'], body=body)
-            log.info("IOLoop running: %s" % tornado.ioloop.IOLoop.instance()._running)
+                                    __callback,
+                                    method=method,
+                                    headers=headers,
+                                    validate_cert=not self.config['dev'],
+                                    body=body)
+            log.info("IOLoop running: %s" % tornado.ioloop.IOLoop
+                     .instance()._running)
             self._should_stop_ioloop_on_finish = True
             if tornado.ioloop.IOLoop.instance()._running:
                 self._should_stop_ioloop_on_finish = False
@@ -267,22 +300,27 @@ class VimeoResource(object):
                 tornado.ioloop.IOLoop.instance().start()
             return
         else:
-            result = HTTPClient().fetch(url, method=method, headers=headers,
-                                        validate_cert=not self.config['dev'], body=body)
-            return self._parse_response_body(result.body, headers=result.headers)
+            result = HTTPClient().fetch(url,
+                                        method=method,
+                                        headers=headers,
+                                        validate_cert=not self.config['dev'],
+                                        body=body)
+            return self._parse_response_body(result.body,
+                                             headers=result.headers)
 
     def _set_auth_markers(self, url, headers):
         """
         Use the supplied app identifiers to try and authenticate the request.
-        First try access token. If that doesn't exist, try using the b64 encoded
-        combination of the client id and client secret for basic auth.
+        First try access token. If that doesn't exist, try using the b64
+        encoded combination of the client id and client secret for basic auth.
         Failing that, try sending the client ID in the querystring.
         Otherwise, return the unaltered url and headers and get ready for a 401
 
-        The keys 'access_token', 'client_id', and 'client_secret' can be supplied
-        in the `config` dictionary. These strings can also be specified via
-        environment variables: VIMEO_ACCESS_TOKEN, VIMEO_CLIENT_ID, and
-        VIMEO_CLIENT_SECRET. These variables can be assigned on linux with
+        The keys 'access_token', 'client_id', and 'client_secret' can be
+        supplied in the `config` dictionary. These strings can also be
+        specified via environment variables: VIMEO_ACCESS_TOKEN,
+        VIMEO_CLIENT_ID, and VIMEO_CLIENT_SECRET. These variables can be
+        assigned on linux with
 
             export VIMEO_CLIENT_ID=my#client#id
 
@@ -293,9 +331,11 @@ class VimeoResource(object):
         Returns a url,headers tuple containing the altered url and headers
         """
         headers = headers.copy()
-        access_token = os.environ.get('VIMEO_ACCESS_TOKEN', self.config['access_token'])
+        access_token = os.environ.get('VIMEO_ACCESS_TOKEN',
+                                      self.config['access_token'])
         client_id = os.environ.get('VIMEO_CLIENT_ID', self.config['client_id'])
-        client_secret = os.environ.get('VIMEO_CLIENT_SECRET', self.config['client_secret'])
+        client_secret = os.environ.get('VIMEO_CLIENT_SECRET',
+                                       self.config['client_secret'])
         if access_token:
             headers["Authorization"] = "bearer %s" % access_token
         elif client_id and client_secret:
@@ -306,7 +346,7 @@ class VimeoResource(object):
                 url += "&client_id=%s" % client_id
             else:
                 url += "?client_id=%s" % client_id
-        return url,headers
+        return url, headers
 
     def _append_querystring(self, url, querys):
         """
@@ -316,9 +356,11 @@ class VimeoResource(object):
 
         Args:
         url (String)    -- The url to which querystring will be appended
-        querys (Dict)   -- The dictionary representing the querystring arguments
+        querys (Dict)   -- The dictionary representing the querystring
+                           arguments
         """
-        if not querys: return url
+        if not querys:
+            return url
         if "?" in url:
             url = url.split('?')[0]
         url = "%s?" % url
@@ -393,26 +435,29 @@ class CallableVimeoResource(VimeoResource):
 
         Args:
         _callback (Function)    -- passed to _request_path
-        async (Boolean)         -- If True, the result will be returned to the top
-                                   level caller inside of a Future
+        async (Boolean)         -- If True, the result will be returned to the
+                                   top level caller inside of a Future
 
         Kwargs:
         See VimeoResource._build_parameters()
         """
         params = self._build_parameters(**kwargs)
-        return self._request_path(self.config, async=async, _callback=_callback, querys=params)
+        return self._request_path(self.config,
+                                  async=async,
+                                  _callback=_callback,
+                                  querys=params)
 
     def __call__(self, async=False, **kwargs):
         """
-        Decide based on the `async` kwarg whether to return a Future or wait for the
-        Future to complete and then return the raw result.
+        Decide based on the `async` kwarg whether to return a Future or wait
+        for the Future to complete and then return the raw result.
 
         The former is used with tornado.gen.coroutine and a `yield` statement.
         The latter is used when calling the library synchronously
 
         Kwargs:
-        async (Boolean)     -- If True, the result of _call__ is returned wrapped
-                               in a Future
+        async (Boolean)     -- If True, the result of _call__ is returned
+                               wrapped in a Future
         """
         log.info("Async: %s" % async)
         ret = self._call__(async=async, **kwargs)
@@ -443,11 +488,12 @@ class SingularResource(VimeoResource):
         search (Boolean)     -- Is this resource searchable
         sort (Boolean)       -- Is this resource sortable
         filter (Boolean)     -- Is this resource filterable
-        accept (String)      -- The type of vimeo resource to accept in a response
+        accept (String)      -- The type of vimeo resource to accept in a
+                                response
         methods (List)       -- List of string HTTP methods (eg ["GET"])
         subresources (Dict)  -- A dictionary structured the same way as the
-                                properties dictionary itself that contains valid
-                                subresources of the resource
+                                properties dictionary itself that contains
+                                valid subresources of the resource
         single_get (Boolean) -- Indicates that the resource responds to GET
                                 requests only for individual subresources
         multi_put (Boolean)  -- Indicates that the resource responds to PUT
@@ -457,16 +503,19 @@ class SingularResource(VimeoResource):
         See resources.py for examples of the `properties` dictionary.
 
         Args:
-        name (String)   -- The unique identifier for this resource (eg "emmett9001")
-        path (String)   -- The preceeding part of the URL path, inherited from the parent class
+        name (String)   -- The unique identifier for this resource
+                           (eg "emmett9001")
+        path (String)   -- The preceeding part of the URL path, inherited
+                           from the parent class
         config (Dict)   -- The global configuration dictionary
         """
         self._identifier = name
         self._urlpath = "%s/%s" % (path, name)
         self.config = config
         self.accept = "*"
-        self.properties = properties  # not the best design since a lot of this class
-                              # expects properties to be implemented a certain way
+        self.properties = properties
+        # not the best design since a lot of this class
+        # expects properties to be implemented a certain way
 
     def __dir__(self):
         return sorted(self.properties.keys())
@@ -484,24 +533,27 @@ class SingularResource(VimeoResource):
 
         Kwargs:
         _callback (Function)    -- passed to _request_path
-        async (Boolean)         -- If True, the result will be returned to the top
-                                   level caller inside of a Future
+        async (Boolean)         -- If True, the result will be returned to the
+                                   top level caller inside of a Future
         See VimeoResource._build_parameters()
         """
         params = self._build_parameters(**kwargs)
-        return self._request_path(self.config, _callback=_callback, async=async, querys=params)
+        return self._request_path(self.config,
+                                  _callback=_callback,
+                                  async=async,
+                                  querys=params)
 
     def __call__(self, async=False, **kwargs):
         """
-        Decide based on the `async` kwarg whether to return a Future or wait for the
-        Future to complete and then return the raw result.
+        Decide based on the `async` kwarg whether to return a Future or wait
+        for the Future to complete and then return the raw result.
 
         The former is used with tornado.gen.coroutine and a `yield` statement.
         The latter is used when calling the library synchronously
 
         Kwargs:
-        async (Boolean)     -- If True, the result of _call__ is returned wrapped
-                               in a Future
+        async (Boolean)     -- If True, the result of _call__ is returned
+                               wrapped in a Future
         """
         log.info("Async: %s" % async)
         ret = self._call__(async=async, **kwargs)
@@ -519,26 +571,32 @@ class SingularResource(VimeoResource):
         """
         Call a method on this resource
 
-        What happens in this method is fairly subclass-specific, and is defined in
-        any SingularResource subclass. This method reads the API calls available for
-        the object's type via the `properties` dictionary (for example, it sees
-        that a User object can call videos())
+        What happens in this method is fairly subclass-specific, and is
+        defined in any SingularResource subclass. This method reads the
+        API calls available for the object's type via the `properties`
+        dictionary (for example, it sees that a User object can call
+        videos())
         """
         # The properties must be known in order for thie method to work
         if name is '_should_stop_ioloop_on_finish':
             return
 
         if not self.properties:
-            raise ValueError, "Resource properties not defined"
+            raise ValueError('Resource properties not defined')
 
         def _make_requester(method, endpoint=""):
             def _do_request(data=None, _callback=None, async=False, **kwargs):
                 params = {}
                 if name not in ["patch", "delete"]:
-                    params = self._build_parameters(capabilities=self._get_capabilities(name),
+                    params = self._build_parameters(capabilities=self.
+                                                    _get_capabilities(name),
                                                     **kwargs)
-                return self._request_path(self.config, _callback=_callback, async=async,
-                                          method=method, endpoint=endpoint, querys=data or params)
+                return self._request_path(self.config,
+                                          _callback=_callback,
+                                          async=async,
+                                          method=method,
+                                          endpoint=endpoint,
+                                          querys=data or params)
             return _do_request
 
         method_mapper = {
@@ -551,21 +609,32 @@ class SingularResource(VimeoResource):
         # return a ResourceEditor subclass based on the information found in
         # `properties`
         if self.prop_is_true(name, 'multi_put'):
-            return PutMultiResourceEditor(name, self._urlpath, self.config,
-                                          self._get_capabilities(name), self.properties)
+            return PutMultiResourceEditor(name,
+                                          self._urlpath,
+                                          self.config,
+                                          self._get_capabilities(name),
+                                          self.properties)
         if self.prop_is_true(name, 'single_get'):
-            return ResourceEditor(name, self._urlpath, self.config,
-                                  self._get_capabilities(name), self.properties)
+            return ResourceEditor(name,
+                                  self._urlpath,
+                                  self.config,
+                                  self._get_capabilities(name),
+                                  self.properties)
         for method in method_mapper.keys():
-            # If the attribute we're getting is an editing method, just perform it
+            # If the attribute we're getting is an editing method,
+            # just perform it
             if name == method.lower():
                 if method in self.methods:
                     return _make_requester(method)
             else:
                 # The attribute might be editable, so return the proper editor
-                if method in self.properties.get(name, {'methods': []})['methods']:
-                    return method_mapper[method](name, self._urlpath, self.config,
-                                                 self._get_capabilities(name), self.properties)
+                if method in self.properties.get(name,
+                                                 {'methods': []})['methods']:
+                    return method_mapper[method](name,
+                                                 self._urlpath,
+                                                 self.config,
+                                                 self._get_capabilities(name),
+                                                 self.properties)
 
         # Maybe the attribute should be treated as a subresource
         # in which case we should instantiate and return that subresource
@@ -577,22 +646,24 @@ class SingularResource(VimeoResource):
                 # by creating a new instance of the subresource class and
                 # returning it
                 properties = self.properties[name]['subresources']
-            return resources.mapper[name](self.config, urlpath=self._urlpath, properties=properties)
+            return resources.mapper[name](self.config,
+                                          urlpath=self._urlpath,
+                                          properties=properties)
 
         # If none of the above are true, just do a GET request for the resource
         return _make_requester("GET", endpoint=name)
 
     def _get_capabilities(self, name):
         """
-        Helper: Construct a dictionary indicating the querying capabilities for a
-        given API method
+        Helper: Construct a dictionary indicating the querying capabilities
+        for a given API method
 
         Args:
         name (String)   -- The method being examined
         """
         def _has_capability(name, capability):
             if capability in self.properties[name].keys():
-                return self.properties[name][capability] == True
+                return self.properties[name][capability] is True
             return True
         capabilities = {}
         capabilities['search'] = _has_capability(name, 'search')
@@ -606,15 +677,15 @@ class SingularResource(VimeoResource):
         is True
         """
         if prop in self.properties.get(name, {}).keys():
-            if self.properties.get(name, {}).get(prop, False) == True:
+            if self.properties.get(name, {}).get(prop, False) is True:
                 return True
         return False
 
     def merge_properties(self, props):
         """
-        Helper: Merge the regular and subresource properties, giving precedence to
-        the subresource ones (allowing the subresource settings to override
-        the defaults).
+        Helper: Merge the regular and subresource properties, giving
+        precedence to the subresource ones (allowing the subresource settings
+        to override the defaults).
 
         This is used when a subresource is instantiated for a resource. For
         example, when accessing /users/1234567/portfolios/1234567, the
@@ -668,24 +739,28 @@ class ResourceEditor(SingularResource):
 
         Kwargs:
         _callback (Function)    -- passed to _request_path
-        async (Boolean)         -- If True, the result will be returned to the top
-                                   level caller inside of a Future
+        async (Boolean)         -- If True, the result will be returned to
+                                   the top level caller inside of a Future
         See VimeoResource._build_parameters()
         """
-        params = self._build_parameters(capabilities=self.capabilities, **kwargs)
-        return self._request_path(self.config, _callback=_callback, async=async, querys=params)
+        params = self._build_parameters(capabilities=self.capabilities,
+                                        **kwargs)
+        return self._request_path(self.config,
+                                  _callback=_callback,
+                                  async=async,
+                                  querys=params)
 
     def __call__(self, async=False, **kwargs):
         """
-        Decide based on the `async` kwarg whether to return a Future or wait for the
-        Future to complete and then return the raw result.
+        Decide based on the `async` kwarg whether to return a Future or wait
+        for the Future to complete and then return the raw result.
 
         The former is used with tornado.gen.coroutine and a `yield` statement.
         The latter is used when calling the library synchronously
 
         Kwargs:
-        async (Boolean)     -- If True, the result of _call__ is returned wrapped
-                               in a Future
+        async (Boolean)     -- If True, the result of _call__ is returned
+                               wrapped in a Future
         """
         log.info("Async: %s" % async)
         ret = self._call__(async=async, **kwargs)
@@ -700,22 +775,32 @@ class ResourceEditor(SingularResource):
             return ret.result()
 
     def delete(self, name, _callback=None):
-        self._request_path(self.config, endpoint=name, _callback=_callback, async=async,
-                method="DELETE")
+        self._request_path(self.config,
+                           endpoint=name,
+                           _callback=_callback,
+                           async=async,
+                           method="DELETE")
 
     def get(self, name, _callback=None):
-        return self._request_path(self.config, endpoint=name, _callback=_callback, async=async,
-                method="GET")
+        return self._request_path(self.config,
+                                  endpoint=name,
+                                  _callback=_callback,
+                                  async=async,
+                                  method="GET")
 
 
 class PutResourceEditor(ResourceEditor):
     """
-    In most cases, this editor is used for resources such as /videos/#id/tags/+tag
-    that support PUT of one subresource or attribute at a time.
+    In most cases, this editor is used for resources such as
+    /videos/#id/tags/+tag that support PUT of one subresource
+    or attribute at a time.
     """
     def put(self, name, _callback=None):
-        self._request_path(self.config, endpoint=name, _callback=_callback, async=async,
-                method="PUT")
+        self._request_path(self.config,
+                           endpoint=name,
+                           _callback=_callback,
+                           async=async,
+                           method="PUT")
 
 
 class PutMultiResourceEditor(PutResourceEditor):
@@ -729,17 +814,21 @@ class PutMultiResourceEditor(PutResourceEditor):
     putmulti() is currently used in only two cases:
 
     * /videos/#id/tags PUT
-        accepts a request body containing a JSON encoded list of new tags for the
-        video. Thus, the request is made without an "endpoint" parameter to allow a
-        PUT action on the root /tags resource.
+        accepts a request body containing a JSON encoded list of new tags
+        for the video. Thus, the request is made without an "endpoint"
+        parameter to allow a PUT action on the root /tags resource.
     * /users/#id/watchlater PUT
         accepts a request body containing a JSON encoded list of video IDs to
         be added to the user's watchlater queue.
     """
     def putmulti(self, data, _callback=None):
         extra_headers = {"Content-Type": "application/json"}
-        self._request_path(self.config, body=json.dumps(data), _callback=_callback, async=async,
-                method="PUT", extra_headers=extra_headers)
+        self._request_path(self.config,
+                           body=json.dumps(data),
+                           _callback=_callback,
+                           async=async,
+                           method="PUT",
+                           extra_headers=extra_headers)
 
 
 class PostPatchResourceEditor(ResourceEditor):
@@ -747,9 +836,16 @@ class PostPatchResourceEditor(ResourceEditor):
     Resource editor that supports POST and PATCH requests
     """
     def post(self, params={}, _callback=None):
-        self._request_path(self.config, querys=params, _callback=_callback, async=async,
-                method="POST")
+        self._request_path(self.config,
+                           querys=params,
+                           _callback=_callback,
+                           async=async,
+                           method="POST")
 
     def patch(self, name, params={}, _callback=None):
-        self._request_path(self.config, endpoint=name, querys=params, _callback=_callback, async=async,
-                method="PATCH")
+        self._request_path(self.config,
+                           endpoint=name,
+                           querys=params,
+                           _callback=_callback,
+                           async=async,
+                           method="PATCH")

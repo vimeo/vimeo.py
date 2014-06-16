@@ -41,16 +41,16 @@ class Uploader():
         Perform an upload of the given file to the current user's account
 
         The upload process consists of three steps and a loop.
-        First, we request and receive an "upload ticket" from Vimeo. This ticket
-        represents our place in the queue of videos waiting to upload.
-        After successfully obtaining this ticket, we upload the binary data of the
-        video. To do this, we make an HTTP request whose body contains some
-        amount of the video's binary data. In response to a subsequent request, Vimeo tells us how
-        much of the binary data was successfully uploaded. We repeat this process
-        until Vimeo tells us the entirety of the file has been uploaded successfully.
-        Once the entire video has been uploaded, the last step is to delete the
-        upload ticket with another HTTP request. This action finalizes the upload
-        process.
+        First, we request and receive an "upload ticket" from Vimeo. This
+        ticket represents our place in the queue of videos waiting to upload.
+        After successfully obtaining this ticket, we upload the binary data
+        of the video. To do this, we make an HTTP request whose body contains
+        some amount of the video's binary data. In response to a subsequent
+        request, Vimeo tells us how much of the binary data was successfully
+        uploaded. We repeat this process until Vimeo tells us the entirety of
+        the file has been uploaded successfully. Once the entire video has been
+        uploaded, the last step is to delete the upload ticket with another
+        HTTP request. This action finalizes the upload process.
 
         Args:
         name (String)   -- The relative filepath of the file to upload
@@ -66,10 +66,12 @@ class Uploader():
 
             _range = 0
             hook_break = False
-            while _range < len(video_data) and hook_break != True:
-                self.upload_segment(upload_uri, _range, video_data, filetype or 'mp4')
+            while _range < len(video_data) and hook_break is not True:
+                self.upload_segment(upload_uri, _range, video_data,
+                                    filetype or 'mp4')
                 _range = self.get_last_uploaded_byte(upload_uri)
-                # hook is passed the range, breaks retry cycle if it returns True
+                # hook is passed the range, breaks retry cycle if it
+                # returns True
                 if post_check_hook:
                     hook_break = post_check_hook(_range)
 
@@ -88,7 +90,8 @@ class Uploader():
         data = None
         with open(filename, "rb") as f:
             data = f.read()
-        filetype = filename.split('.')[-1] if '.' in filename.split('/')[-1] else None
+        filetype = filename.split('.')[-1] if '.' in filename.split('/')[-1] \
+            else None
         return data, filetype
 
     def get_upload_ticket(self):
@@ -102,21 +105,24 @@ class Uploader():
 
         Return: tuple of ticket_id, upload_uri, complete_uri
         """
-        r = HTTPClient().fetch(self.config['apiroot'] + self.ticket_path, method="POST",
-                body=urlencode({'type': 'streaming'}), headers = self.standard_headers,
-                validate_cert=not self.config['dev'])
+        r = HTTPClient().fetch(self.config['apiroot'] + self.ticket_path,
+                               method="POST",
+                               body=urlencode({'type': 'streaming'}),
+                               headers=self.standard_headers,
+                               validate_cert=not self.config['dev'])
         response = json.loads(r.body)
-        return response['ticket_id'], response['upload_link_secure'], response['complete_uri']
+        return response['ticket_id'], response['upload_link_secure'],
+        response['complete_uri']
 
     def upload_segment(self, upload_uri, _range, data, filetype):
         """
         Upload a piece of a video file to Vimeo
         Makes a PUT request to the given URL with the given binary data
 
-        The _range parameter indicates the first byte to send. The first time you
-        attempt an upload, this will be 0. The next time, it will be the number
-        returned from get_last_uploaded_byte, if that number is less than the total
-        size of the video file in bytes.
+        The _range parameter indicates the first byte to send. The first time
+        you attempt an upload, this will be 0. The next time, it will be the
+        number returned from get_last_uploaded_byte, if that number is less
+        than the total size of the video file in bytes.
 
         Args:
         upload_uri (String)     -- The url to request when uploading
@@ -125,12 +131,13 @@ class Uploader():
         """
         content_range = '%d-%d/%d' % (_range, len(data), len(data))
         upload_headers = {'Content-Type': 'video/%s' % filetype,
-                        'Content-Length': len(data),
-                        'Content-Range': 'bytes: %s' % content_range}
+                          'Content-Length': len(data),
+                          'Content-Range': 'bytes: %s' % content_range}
 
         log.info("Sending file of size %d" % len(data))
         log.info("Requesting %s" % upload_uri)
-        request_headers = dict(upload_headers.items() + self.standard_headers.items())
+        request_headers = dict(upload_headers.items() +
+                               self.standard_headers.items())
         r = HTTPClient().fetch(upload_uri, method="PUT",
                                body=data, headers=request_headers)
         log.info("Uploaded segment: status code %d" % r.code)
@@ -143,23 +150,28 @@ class Uploader():
 
         Performs a PUT to the given url, which returns a Range header
         indicating how much of the video file was successfully uploaded.
-        If less than the total file size, this number is used in subsequent calls to
-        upload_segment
+        If less than the total file size, this number is used in subsequent
+        calls to upload_segment
 
         Args:
         check_uri (String)  -- The URI to which to perform the PUT request
         """
         upload_check_headers = {'Content-Range': 'bytes */*'}
-        request_headers = dict(upload_check_headers.items() + self.standard_headers.items())
+        request_headers = dict(upload_check_headers.items() +
+                               self.standard_headers.items())
         try:
-            HTTPClient().fetch(check_uri, method="PUT", body='', headers=request_headers)
+            HTTPClient().fetch(check_uri,
+                               method="PUT",
+                               body='',
+                               headers=request_headers)
         except HTTPError as e:
             log.info("Upload check: status code %s" % e.code)
             if e.code == 308:
                 _range = int(e.response.headers['Range'].split('-')[1])
                 log.info("Last uploaded byte: %d" % _range)
                 return _range
-            else: raise
+            else:
+                raise
         raise ValueError("Upload check unsuccessful")
 
     def delete_upload_ticket(self, complete_uri):
@@ -177,7 +189,9 @@ class Uploader():
         """
         url = self.config['apiroot'] + complete_uri
         log.info("Requesting %s" % url)
-        r = HTTPClient().fetch(url, method="DELETE", headers=self.standard_headers,
+        r = HTTPClient().fetch(url,
+                               method="DELETE",
+                               headers=self.standard_headers,
                                validate_cert=not self.config['dev'])
         log.info("Upload completed: status code: %d" % r.code)
         if r.code == 201:

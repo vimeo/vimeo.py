@@ -4,12 +4,14 @@ import tornado.gen
 
 from vimeo import VimeoClient
 
+
 class TestSyncHandler(tornado.web.RequestHandler):
     def get(self):
         """
         Demonstrates synchronous use of VimeoClient
 
-        Caller does not need to be wrapped in a decorator, result is returned synchronously
+        Caller does not need to be wrapped in a decorator,
+        result is returned synchronously
         """
         vimeo = VimeoClient("YOUR ACCESS TOKEN")
         res = vimeo.users.emmett9001()
@@ -43,6 +45,7 @@ class TestCallbackHandler(tornado.web.RequestHandler):
         Call to API function must include the callback kwarg
         """
         vimeo = VimeoClient("YOUR ACCESS TOKEN")
+
         def callback(result):
             self.write(result)
             self.finish()
