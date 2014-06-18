@@ -537,8 +537,20 @@ class SingularResource(VimeoResource):
                 if name not in ["patch", "delete"]:
                     params = self._build_parameters(capabilities=self._get_capabilities(name),
                                                     **kwargs)
-                return self._request_path(self.config, _callback=_callback, async=async,
-                                          method=method, endpoint=endpoint, querys=data or params)
+
+                kwargs = {
+                    '_callback': _callback,
+                    'async': async,
+                    'method': method,
+                    'endpoint': endpoint
+                }
+
+                if name in {"patch", "post"}:
+                    kwargs['extra_headers'] = {'Content-Type': 'application/json'}
+                    kwargs['body'] = json.dumps(data or params)
+                else:
+                    kwargs['querys'] = data or params
+                return self._request_path(self.config, **kwargs)
             return _do_request
 
         method_mapper = {
