@@ -29,22 +29,16 @@ class VimeoClient():
     Root of the vimeo API
     All API endpoints are accessible via getattr() on VimeoClient
     """
-    def __init__(self,
-                 access_token=None,
-                 client_id=None,
-                 client_secret=None,
-                 dev=False):
+    def __init__(self, access_token=None, client_id=None, client_secret=None, dev=False):
         """
         Create an instance of VimeoClient
-        Simply sets up some global configuration and allocates all
-        attributes (API endpoints)
+        Simply sets up some global configuration and allocates all attributes (API endpoints)
 
         Args:
         access_token (String) -- your OAuth2 access token (required)
 
         Kwargs:
-        dev (Boolean) -- If true, the VimeoClient will make calls
-        to api.vimeo.dev
+        dev (Boolean) -- If true, the VimeoClient will make calls to api.vimeo.dev
         """
         # Global configuration used for all requests
         self.config = {
@@ -59,21 +53,19 @@ class VimeoClient():
             'apiroot': 'https://api.vimeo.%s' % ('dev' if dev else 'com'),
 
             # The custom HTTP user agent string for this library
-            'user-agent':
-            'python-vimeo 0.1; (http://developer.vimeo.com/api/docs)',
+            'user-agent': 'python-vimeo 0.1; (http://developer.vimeo.com/api/docs)',
 
             # Run in development mode?
             'dev': dev,
 
-            # Default "Accept" HTTP header sent with every request
-            # if none is specified
+            # Default "Accept" HTTP header sent with every request if none is specified
             'accept': 'application/vnd.vimeo.*+json; version=3.0'
         }
 
         """
         Roots of API subtrees. Most correspond to VimeoResource instances
-        Each of the keys in this dictionary is used as an attribute of the
-        instance. Each of the values in this dictionary must be callable
+        Each of the keys in this dictionary is used as an attribute of the instance
+        Each of the values in this dictionary must be callable
 
         These properties are accessed via, for example,
 
@@ -99,8 +91,8 @@ class VimeoClient():
         """
         Primary entry point for API request methods and subtrees
 
-        This class defines some utility methods explicitly, but all API call
-        methods are accessed via getattr()
+        This class defines some utility methods explicitly, but all API call methods
+        are accessed via getattr()
         """
         return self.resource_roots[name](self.config)
 
@@ -142,8 +134,7 @@ class VimeoClient():
             log.basicConfig(level=getattr(log, loglevel))
         else:
             log.basicConfig(level=log.ERROR)
-            log.error("Unrecognized loglevel %s, defaulting to ERROR",
-                      loglevel)
+            log.error("Unrecognized loglevel %s, defaulting to ERROR", loglevel)
 
     def authenticate(self, auth_code, client_id, secret, redirect):
         """
@@ -158,6 +149,4 @@ class VimeoClient():
         """
         self.config['access_token'] = get_access_token(auth_code,
                                                        self.config['apiroot'],
-                                                       client_id,
-                                                       secret,
-                                                       redirect)
+                                                       client_id, secret, redirect)

@@ -2,4 +2,3 @@ tornado
 pytest
 requests
 distutils
-pep8

@@ -19,7 +19,6 @@ under the License.
 
 from functools import partial
 
-
 class VimeoResponse(dict):
     """Model a response from the Vimeo API.
 
@@ -31,9 +30,8 @@ class VimeoResponse(dict):
         self.resource_handle = resource_handle
         super(VimeoResponse, self).__init__(*args, **kwargs)
 
-        # Presently there is nothing to do if we don't have a body in the
-        # response, just be a dumb dict.
-        if 'body' not in self:
+        # Presently there is nothing to do if we don't have a body in the response, just be a dumb dict.
+        if not 'body' in self:
             return
 
         if 'paging' in self['body']:
@@ -43,8 +41,7 @@ class VimeoResponse(dict):
     def _get_named_page(self, page, async=False, *args, **kwargs):
         """Get a specified page from the paging section of the response.
 
-        For instance, if we have a "next" page, then we can call response.
-        _get_named_page('next') and it will retrieve it."""
+        For instance, if we have a "next" page, then we can call response._get_named_page('next') and it will retrieve it."""
         return self.resource_handle._request_path(
             self.resource_handle.config,
             url_override=self['body']['paging'][page],
