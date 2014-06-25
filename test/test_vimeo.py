@@ -28,34 +28,34 @@ vimeo = None
 test_data = {}
 
 dev_data = {
-    'user': "12233214",
-    'access_token': "58b68afc670f2b3bf8836e56f4879af8",  # fully privileged access token belonging to testuser
-    'client_id': "90bed05a315cf49d45ca2e453179eadb81e62ed7",
-    'client_secret': "bd91cfd28bbc0fc747189528e950df7a1c8b95bb",
-    'channel': "c630249",  # channel owned by testuser
-    'group': "g211471",  # group *NOT* owned by testuser
-    'mygroup': "g206223",  # group *NOT* owned by testuser
-    'presets': "354246",  # presets on video owned by testuser
-    'likevideo': "76115773",  # video not owned by testuser
-    'followuser': "12596222",  # other user
-    'editvideo': "v70429873",  # video owned by testuser
-    'portfolio': "p191937",  # portfolio named "test-portfolio" owned by testuser containing editvideo
-    'album': "a2618551",  # album owned by testuser
-    'category': "comedy",
-    'uploadvideo': "/home/emmett/Desktop/test2.mp4"
+    'user': os.environ.get('DEV_USER'),
+    'access_token': os.environ.get('DEV_ACCESS_TOKEN'),  # fully privileged access token belonging to testuser
+    'client_id': os.environ.get('DEV_CLIENT_ID'),
+    'client_secret': os.environ.get('DEV_CLIENT_SECRET'),
+    'channel': os.environ.get('DEV_CHANNEL'),  # channel owned by testuser
+    'group': os.environ.get('DEV_GROUP'),  # group *NOT* owned by testuser
+    'mygroup': os.environ.get('DEV_MYGROUP'),  # group *NOT* owned by testuser
+    'presets': os.environ.get('DEV_PRESETS'),  # presets on video owned by testuser
+    'likevideo': os.environ.get('DEV_LIKEVIDEO'),  # video not owned by testuser
+    'followuser': os.environ.get('DEV_FOLLOWUSER'),  # other user
+    'editvideo': os.environ.get('DEV_EDITVIDEO'),  # video owned by testuser
+    'portfolio': os.environ.get('DEV_PORTFOLIO'),  # portfolio named "test-portfolio" owned by testuser containing editvideo
+    'album': os.environ.get('DEV_ALBUM'),  # album owned by testuser
+    'category': os.environ.get('DEV_CATEGORY'),
+    'uploadvideo': os.environ.get('DEV_UPLOADVIDEO')
 }
 
 prod_data = {
-    'user': '20652831',
-    'access_token': 'YOUR ACCESS TOKEN HERE',
-    'client_id': 'YOUR CLIENT ID HERE',
-    'client_secret': 'YOUR CLIENT SECRET HERE',
-    'channel': 'c638518',
-    'presets': '325649',
-    'editvideo': 'v73879996',
-    'portfolio': 'p166225',
-    'album': 'a2639089',
-    'uploadvideo': 'testupload.mp4'
+    'user': os.environ.get('PROD_USER'),
+    'access_token': os.environ.get('PROD_ACCESS_TOKEN'),
+    'client_id': os.environ.get('PROD_CLIENT_ID'),
+    'client_secret': os.environ.get('PROD_CLIENT_SECRET'),
+    'channel': os.environ.get('PROD_CHANNEL'),
+    'presets': os.environ.get('PROD_PRESETS'),
+    'editvideo': os.environ.get('PROD_EDITVIDEO'),
+    'portfolio': os.environ.get('PROD_PORTFOLIO'),
+    'album': os.environ.get('PROD_ALBUM'),
+    'uploadvideo': os.environ.get('PROD_UPLOADVIDEO')
 }
 
 for key in dev_data:
