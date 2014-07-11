@@ -92,7 +92,7 @@ def get_access_token(auth_code, api_root, cid, secret, redirect, dev=False):
     payload = {"grant_type": "authorization_code",
             "code": auth_code,
             "redirect_uri": redirect}
-    headers = {"Accept": "application/vnd.vimeo.*+json; version=3.0",
+    headers = {"Accept": "application/vnd.vimeo.*+json; version=3.2",
             "Authorization": "Basic %s" % encoded}
 
     response = HTTPClient().fetch("%s/oauth/access_token" % api_root,
@@ -120,7 +120,7 @@ def get_client_credentials(client_id, client_secret, scopes=None, api_root='http
     """
     basic_auth = base64.b64encode("%s:%s" % (client_id, client_secret))
     payload = {"grant_type": "client_credentials"}
-    headers = {"Accept": "application/vnd.vimeo.*+json; version=3.0",
+    headers = {"Accept": "application/vnd.vimeo.*+json; version=3.2",
             "Authorization": "Basic %s" % basic_auth}
 
     if scopes:

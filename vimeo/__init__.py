@@ -59,7 +59,7 @@ class VimeoClient():
             'dev': dev,
 
             # Default "Accept" HTTP header sent with every request if none is specified
-            'accept': 'application/vnd.vimeo.*+json; version=3.0'
+            'accept': 'application/vnd.vimeo.*+json; version=3.2'
         }
 
         """
