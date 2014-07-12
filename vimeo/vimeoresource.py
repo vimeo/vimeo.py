@@ -16,7 +16,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-import json
+try: 
+    import simplejson as json
+except ImportError: 
+    import json
+
 import os
 from urllib import urlencode
 import logging as log
