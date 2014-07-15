@@ -20,7 +20,7 @@ under the license.
 import logging as log
 
 import resources
-from uploads import Uploader
+from uploads import Uploader, PictureUploader
 from auth import get_access_token
 
 
@@ -74,7 +74,8 @@ class VimeoClient():
         """
         self.resource_roots = dict({
             "me": self._setup_me,
-            "upload": self._setup_upload
+            "upload": self._setup_upload,
+            "uploadpicture": self._setup_picture_upload
         }.items() + resources.mapper.items())
 
     def __dir__(self):
@@ -128,6 +129,20 @@ class VimeoClient():
         config (Dict) -- the global configuration dictionary
         """
         return Uploader(config)
+
+    def _setup_picture_upload(self, config):
+        """
+        Generate a new PictureUploader object
+
+        Called with
+
+            vimeo = VimeoClient("####")
+            vimeo.uploadphoto(item_uri, file_path)
+
+        Args:
+        config (Dict) -- the global configuration dictionary
+        """
+        return PictureUploader(config)
 
     def set_loglevel(self, loglevel):
         if hasattr(log, loglevel):
