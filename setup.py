@@ -20,7 +20,7 @@ under the license.
 from distutils.core import setup
 
 setup(name='vimeo',
-      version='1.0',
+      version='2.0',
       description="Python library for the Vimeo API v3",
       author="Vimeo Staff",
       author_email="support@vimeo.com",

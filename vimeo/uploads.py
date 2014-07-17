@@ -184,3 +184,60 @@ class Uploader():
             _id = r.headers['location'].split('/')[-1]
             return _id
         raise ValueError("Upload completion unsuccessful")
+
+class PictureUploader():
+    """
+    Class responsible for uploading pictures via the Vimeo API
+    """
+    PICTURE_CREATE_PATH_EXTENSION = '/pictures'
+
+    def __init__(self, config):
+        self.config = config
+        self.standard_headers = {
+            'Accept': config['accept'],
+            'Authorization': 'bearer %s' % config['access_token'],
+            'User-Agent': config['user-agent']
+        }
+
+    def __call__(self, item_uri, name):
+        """
+        Perform an upload of the given picture to the object
+
+        Args:
+        item_uri (String)   -- The uri from the API of the object to set the picture on
+        name (String)   -- The relative filepath of the file to upload
+        """
+        picture_create_uri = item_uri + self.PICTURE_CREATE_PATH_EXTENSION
+
+        upload_target, picture_uri = self.create_picture(picture_create_uri)
+        assert self.upload_file(upload_target, self.read_file(name))
+        assert self.activate_picture(picture_uri)
+
+    def create_picture(self, path):
+        r = HTTPClient().fetch(self.config['apiroot'] + path, method="POST", body="",
+            headers = self.standard_headers, validate_cert=not self.config['dev'])
+        response = json.loads(r.body)
+        return response['link'], response['uri']
+
+    def upload_file(self, target, body):
+        r = HTTPClient().fetch(target, method="PUT", body=body,
+            validate_cert=not self.config['dev'])
+        response = json.loads(r.body)
+        return response['Status'] == 'success'
+
+    def activate_picture(self, path):
+        r = HTTPClient().fetch(self.config['apiroot'] + path, method="PATCH", body='{"active": true}',
+            headers = self.standard_headers, validate_cert=not self.config['dev'])
+        return r.code == 200 or r.code == 204
+
+    def read_file(self, filename):
+        """
+        Open a binary file and return its contents and extension
+
+        Args:
+        filename (String)   -- The relative path of the file to read
+        """
+        data = None
+        with open(filename, "rb") as f:
+            data = f.read()
+        return data
