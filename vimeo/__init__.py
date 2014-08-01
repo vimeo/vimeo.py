@@ -50,7 +50,7 @@ class VimeoClient():
             'client_secret': client_secret,
 
             # The root of all API request URLs
-            'apiroot': 'https://api.vimeo.%s' % ('dev' if dev else 'com'),
+            'apiroot': 'https://api.vimeo.com' if not api_root else api_root,
 
             # The custom HTTP user agent string for this library
             'user-agent': 'python-vimeo 0.1; (http://developer.vimeo.com/api/docs)',
