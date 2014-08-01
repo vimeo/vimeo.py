@@ -29,7 +29,7 @@ class VimeoClient():
     Root of the vimeo API
     All API endpoints are accessible via getattr() on VimeoClient
     """
-    def __init__(self, access_token=None, client_id=None, client_secret=None, dev=False):
+    def __init__(self, access_token=None, client_id=None, client_secret=None, api_root=None):
         """
         Create an instance of VimeoClient
         Simply sets up some global configuration and allocates all attributes (API endpoints)
@@ -38,7 +38,7 @@ class VimeoClient():
         access_token (String) -- your OAuth2 access token (required)
 
         Kwargs:
-        dev (Boolean) -- If true, the VimeoClient will make calls to api.vimeo.dev
+        api_root (String) -- the api root for calls
         """
         # Global configuration used for all requests
         self.config = {
@@ -50,13 +50,10 @@ class VimeoClient():
             'client_secret': client_secret,
 
             # The root of all API request URLs
-            'apiroot': 'https://api.vimeo.%s' % ('dev' if dev else 'com'),
+            'apiroot': 'https://api.vimeo.com' if not api_root else api_root,
 
             # The custom HTTP user agent string for this library
             'user-agent': 'python-vimeo 0.1; (http://developer.vimeo.com/api/docs)',
-
-            # Run in development mode?
-            'dev': dev,
 
             # Default "Accept" HTTP header sent with every request if none is specified
             'accept': 'application/vnd.vimeo.*+json; version=3.2'
