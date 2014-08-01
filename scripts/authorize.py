@@ -42,9 +42,15 @@ if __name__ == "__main__":
     parser.add_argument('--redirect', '-r', help="Your app's redirect URI", nargs=1, required=True)
     parser.add_argument('--scopes', '-o', help="Your requested scopes",
                         nargs=argparse.REMAINDER, required=True)
+    parser.add_argument('--dev', '-d', action="store_true", help="Use dev server")
     args = parser.parse_args()
 
-    api_root = "https://api.vimeo.com"
+    api_root = "http://api.vimeo."
+
+    if args.dev:
+        api_root += "dev"
+    else:
+        api_root += "com"
 
     def do_auth_flow(api_root, cid, secret, scopes, redirect):
         print "Visit %s in a browser" % get_auth_url(api_root, cid, scopes, redirect)
