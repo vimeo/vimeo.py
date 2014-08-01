@@ -35,8 +35,9 @@ class VimeoResponse(dict):
             return
 
         if 'paging' in self['body']:
-            for name in self['body']['paging']:
-                self.__setattr__(name, partial(self._get_named_page, name))
+            for name, url in self['body']['paging'].iteritems():
+                if url:
+                    self.__setattr__(name, partial(self._get_named_page, name))
 
     def _get_named_page(self, page, async=False, *args, **kwargs):
         """Get a specified page from the paging section of the response.

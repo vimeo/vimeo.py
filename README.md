@@ -164,6 +164,18 @@ successfully uploaded. You can supply a hook to the upload function. If you do
 so, this hook will be called after each size check. See the docstrings in
 `upload.py` for details.
 
+Picture Uploads
+-------
+
+The library handles uploading a picture for a user or video with a single call:
+
+    vimeo.uploadpicture('/videos/76069789', 'test.jpg')
+
+If your access token is allowed the `upload` scope, you can use this method.
+
+Behind the scenes, the library makes a number of requests on your behalf to
+upload the picture and connect and activate it on the object.
+
 Testing
 -------
 
