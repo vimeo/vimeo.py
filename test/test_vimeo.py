@@ -25,49 +25,53 @@ from vimeo import VimeoClient
 
 
 vimeo = None
-test_data = {}
+#prod_data = {}
 
-dev_data = {
-    'user': "12233214",
-    'access_token': "58b68afc670f2b3bf8836e56f4879af8",  # fully privileged access token belonging to testuser
-    'client_id': "90bed05a315cf49d45ca2e453179eadb81e62ed7",
-    'client_secret': "bd91cfd28bbc0fc747189528e950df7a1c8b95bb",
-    'channel': "c630249",  # channel owned by testuser
-    'group': "g211471",  # group *NOT* owned by testuser
-    'mygroup': "g206223",  # group *NOT* owned by testuser
-    'presets': "354246",  # presets on video owned by testuser
-    'likevideo': "76115773",  # video not owned by testuser
-    'followuser': "12596222",  # other user
-    'editvideo': "v70429873",  # video owned by testuser
-    'portfolio': "p191937",  # portfolio named "test-portfolio" owned by testuser containing editvideo
-    'album': "a2618551",  # album owned by testuser
-    'category': "comedy",
-    'uploadvideo': "/home/emmett/Desktop/test2.mp4"
-}
+#dev_data = {
+#    'user': "12233214",
+#    'access_token': "58b68afc670f2b3bf8836e56f4879af8",  # fully privileged access token belonging to testuser
+#    'client_id': "90bed05a315cf49d45ca2e453179eadb81e62ed7",
+#    'client_secret': "bd91cfd28bbc0fc747189528e950df7a1c8b95bb",
+#    'channel': "c630249",  # channel owned by testuser
+#    'group': "g211471",  # group *NOT* owned by testuser
+#    'mygroup': "g206223",  # group *NOT* owned by testuser
+#    'presets': "354246",  # presets on video owned by testuser
+#    'likevideo': "76115773",  # video not owned by testuser
+#    'followuser': "12596222",  # other user
+#    'editvideo': "v70429873",  # video owned by testuser
+#    'portfolio': "p191937",  # portfolio named "test-portfolio" owned by testuser containing editvideo
+#    'album': "a2618551",  # album owned by testuser
+#    'category': "comedy",
+#    'uploadvideo': "/home/emmett/Desktop/test2.mp4"
+#}
 
 prod_data = {
-    'user': '20652831',
-    'access_token': 'YOUR ACCESS TOKEN HERE',
-    'client_id': 'YOUR CLIENT ID HERE',
-    'client_secret': 'YOUR CLIENT SECRET HERE',
+    'user': 'greedo',
+    'access_token': '69eb2aeff16af8e9b842e6e814f05239',
+    'client_id': 'a3af5160282fb56f3dccc6c181bf5749a958f6ef',
+    'client_secret': 'cd3ee7956583602ec782a5740e48ec19a2eaa076',
     'channel': 'c638518',
+    'group': 'g211471',
     'presets': '325649',
+    'likevideo': '76115773',
+    'followuser': '12596222',
     'editvideo': 'v73879996',
     'portfolio': 'p166225',
     'album': 'a2639089',
+    'category': "comedy",
     'uploadvideo': 'testupload.mp4'
 }
 
-for key in dev_data:
-    if key not in prod_data:
-        prod_data[key] = dev_data[key]
+#for key in dev_data:
+#    if key not in prod_data:
+#        prod_data[key] = dev_data[key]
 
 @pytest.fixture
-def setup(dev):
+def setup():
     global vimeo
-    global test_data
-    test_data = dev_data if dev else prod_data
-    vimeo = VimeoClient(test_data['access_token'], dev=bool(dev))
+    #global prod_data
+    #prod_data = dev_data if dev else prod_data
+    vimeo = VimeoClient(prod_data['access_token'])
 
 
 class VimeoObjectTest():
@@ -238,16 +242,16 @@ class TestClient():
         with pytest.raises(Exception):
             vimeo.upload("notafile.mp4")
 
-    def test_auth_modes(self, dev):
-        vimeo = VimeoClient(access_token=test_data['access_token'], dev=bool(dev))
+    def test_auth_modes(self):
+        vimeo = VimeoClient(access_token=prod_data['access_token'])
         r = vimeo.me.videos()
         assert 'data' in r['body'], "Access token auth should work"
 
-        vimeo = VimeoClient(client_id=test_data['client_id'], client_secret=test_data['client_secret'], dev=bool(dev))
+        vimeo = VimeoClient(client_id=prod_data['client_id'], client_secret=prod_data['client_secret'])
         r = vimeo.users.emmett9001()
         assert 'uri' in r['body'], "Basic auth with cid and secret should work"
 
-        vimeo = VimeoClient(client_id=test_data['client_id'], dev=bool(dev))
+        vimeo = VimeoClient(client_id=prod_data['client_id'])
         r = vimeo.users.emmett9001()
         assert 'uri' in r['body'], "Basic auth with cid should work"
 
@@ -264,59 +268,59 @@ class TestUser(VimeoObjectTest):
         self.search('users')
 
     def test_single_user(self):
-        self.single_lookup('users', test_data['user'])
+        self.single_lookup('users', prod_data['user'])
 
     def test_me(self):
         me = vimeo.me()
-        user = getattr(vimeo.users, test_data['user'])()
+        user = getattr(vimeo.users, prod_data['user'])()
         assert me['body']['uri'] == user['body']['uri'], "/me should return an identical uri"
 
     def test_user_activities(self):
-        self.multi_lookup('users', test_data['user'], 'activities')
+        self.multi_lookup('users', prod_data['user'], 'activities')
 
     def test_user_albums(self):
-        self.multi_lookup('users', test_data['user'], 'albums')
+        self.multi_lookup('users', prod_data['user'], 'albums')
 
     def test_user_appearances(self):
-        self.multi_lookup('users', test_data['user'], 'appearances')
+        self.multi_lookup('users', prod_data['user'], 'appearances')
 
     def test_user_channels(self):
-        self.multi_lookup('users', test_data['user'], 'channels')
+        self.multi_lookup('users', prod_data['user'], 'channels')
 
-        tchannel = test_data['channel'].strip("c")
-        self.put_item('users', test_data['user'], 'channels', tchannel)
-        self.delete_item('users', test_data['user'], 'channels', tchannel)
+        tchannel = prod_data['channel'].strip("c")
+        self.put_item('users', prod_data['user'], 'channels', tchannel)
+        self.delete_item('users', prod_data['user'], 'channels', tchannel)
 
     def test_user_feed(self):
-        self.multi_lookup('users', test_data['user'], 'feed')
+        self.multi_lookup('users', prod_data['user'], 'feed')
 
     def test_user_followers(self):
-        self.multi_lookup('users', test_data['user'], 'followers')
+        self.multi_lookup('users', prod_data['user'], 'followers')
 
     def test_user_following(self):
-        self.multi_lookup('users', test_data['user'], 'following')
+        self.multi_lookup('users', prod_data['user'], 'following')
 
-        self.put_item('users', test_data['user'], 'following', test_data['followuser'])
-        self.delete_item('users', test_data['user'], 'following', test_data['followuser'])
+        self.put_item('users', prod_data['user'], 'following', prod_data['followuser'])
+        self.delete_item('users', prod_data['user'], 'following', prod_data['followuser'])
 
         with pytest.raises(Exception):
-            vimeo.me.following.get(test_data['followuser'])
+            vimeo.me.following.get(prod_data['followuser'])
 
     def test_user_groups(self):
-        self.multi_lookup('users', test_data['user'], 'groups')
+        self.multi_lookup('users', prod_data['user'], 'groups')
 
-        tgroup = test_data['group'].strip("g")
-        self.put_item('users', test_data['user'], 'groups', tgroup)
-        self.delete_item('users', test_data['user'], 'groups', tgroup)
+        tgroup = prod_data['group'].strip("g")
+        self.put_item('users', prod_data['user'], 'groups', tgroup)
+        self.delete_item('users', prod_data['user'], 'groups', tgroup)
 
     def test_user_likes(self):
-        self.multi_lookup('users', test_data['user'], 'likes')
+        self.multi_lookup('users', prod_data['user'], 'likes')
 
-        self.put_item('users', test_data['user'], 'likes', test_data['likevideo'])
-        self.delete_item('users', test_data['user'], 'likes', test_data['likevideo'])
+        self.put_item('users', prod_data['user'], 'likes', prod_data['likevideo'])
+        self.delete_item('users', prod_data['user'], 'likes', prod_data['likevideo'])
 
-    def test_user_portfolios(self, dev):
-        user = getattr(vimeo.users, test_data['user'])
+    def test_user_portfolios(self):
+        user = getattr(vimeo.users, prod_data['user'])
         r = user.portfolios()
         assert r['body'], "User portfolio lookup should return an object"
         assert 'data' in r['body'], "User portfolio lookup should return some data"
@@ -325,42 +329,41 @@ class TestUser(VimeoObjectTest):
             assert 'data' in response['body'], "User portfolio lookup should work asynchronously"
         user.portfolios(_callback=handle)
 
-        r = user.portfolios.get(test_data['portfolio']).videos()
+        r = user.portfolios.get(prod_data['portfolio']).videos()
         assert r['body'], "User portfolio videos lookup should return an object"
         assert 'data' in r['body'], "User portfolio videos lookup should return some data"
 
         r = user.portfolios.get("test-portfolio")()
         assert True, "User portfolio should work with hyphen"
 
-        if not dev:
-            pytest.skip(msg="User portfolios endpoint not found in prod")
+        pytest.skip(msg="User portfolios endpoint not found in prod")
 
-        r = user.portfolios.get(test_data['portfolio']).videos.get("70429873")()
+        r = user.portfolios.get(prod_data['portfolio']).videos.get("70429873")()
         assert r['body'], "User portfolio video lookup should return an object"
         assert 'uri' in r['body'], "User portfolio video lookup should return a video"
 
     def test_user_presets(self):
-        self.multi_lookup('users', test_data['user'], 'presets')
-        self.exists('users', test_data['user'], 'presets', test_data['presets'])
+        self.multi_lookup('users', prod_data['user'], 'presets')
+        self.exists('users', prod_data['user'], 'presets', prod_data['presets'])
 
     def test_user_videos(self):
-        self.multi_lookup('users', test_data['user'], 'videos')
+        self.multi_lookup('users', prod_data['user'], 'videos')
 
-        r = vimeo.me.videos.get(test_data['editvideo'].strip("v"))
+        r = vimeo.me.videos.get(prod_data['editvideo'].strip("v"))
         assert r != None, "User single video GET should succeed for owned video"
         with pytest.raises(Exception):
             vimeo.me.videos.get("1234567")
 
     def test_user_watchlater(self):
-        self.multi_lookup('users', test_data['user'], 'watchlater')
+        self.multi_lookup('users', prod_data['user'], 'watchlater')
 
-        self.put_item('users', test_data['user'], 'watchlater', test_data['likevideo'])
-        self.delete_item('users', test_data['user'], 'watchlater', test_data['likevideo'])
+        self.put_item('users', prod_data['user'], 'watchlater', prod_data['likevideo'])
+        self.delete_item('users', prod_data['user'], 'watchlater', prod_data['likevideo'])
 
         vimeo.me.watchlater.putmulti({"clips": [70899262]})
         vimeo.me.watchlater.get('70899262')
         with pytest.raises(Exception):
-            vimeo.me.watchlater.get(test_data['likevideo'])
+            vimeo.me.watchlater.get(prod_data['likevideo'])
         assert True, "Watchlaters PUT should replace all watchlaters"
 
 
@@ -370,65 +373,65 @@ class TestVideo(VimeoObjectTest):
         self.search('videos')
 
     def test_videos_single(self):
-        self.single_lookup('videos', test_data['editvideo'])
+        self.single_lookup('videos', prod_data['editvideo'])
         editname = 'iwasedited'
-        vimeo.videos.get(test_data['editvideo']).patch({'name': editname})
-        r = vimeo.videos.get(test_data['editvideo'])()
-        if test_data['editvideo'] in r['body']['link']:
+        vimeo.videos.get(prod_data['editvideo']).patch({'name': editname})
+        r = vimeo.videos.get(prod_data['editvideo'])()
+        if prod_data['editvideo'] in r['body']['link']:
             assert r['body']['name'] == editname
         # reset for next run
-        vimeo.videos.get(test_data['editvideo']).patch({'name': 'Nellie Krumping'})
+        vimeo.videos.get(prod_data['editvideo']).patch({'name': 'Nellie Krumping'})
 
     def test_video_comments(self):
-        self.multi_lookup('videos', test_data['editvideo'], 'comments')
+        self.multi_lookup('videos', prod_data['editvideo'], 'comments')
 
-        pid = self.post_item('videos', test_data['editvideo'], 'comments', {'text': 'testing text'})
+        pid = self.post_item('videos', prod_data['editvideo'], 'comments', {'text': 'testing text'})
         pid = pid.strip('/comments')
 
         resources = getattr(vimeo, 'videos')
-        resource = getattr(resources, test_data['editvideo'])
+        resource = getattr(resources, prod_data['editvideo'])
         r = getattr(resource, 'comments').get(pid)
         assert '/'.join(pid.split('/')[-2:]) in r['body']['uri'], "%s should be able to get comments" % (str(resource))
 
-        self.patch_item('videos', test_data['editvideo'], 'comments', pid, {'text': 'edited text'})
-        self.delete_item('videos', test_data['editvideo'], 'comments', pid)
+        self.patch_item('videos', prod_data['editvideo'], 'comments', pid, {'text': 'edited text'})
+        self.delete_item('videos', prod_data['editvideo'], 'comments', pid)
 
     def test_video_credits(self):
-        self.multi_lookup('videos', test_data['editvideo'], 'credits')
+        self.multi_lookup('videos', prod_data['editvideo'], 'credits')
 
-        pid = self.post_item('videos', test_data['editvideo'], 'credits',
+        pid = self.post_item('videos', prod_data['editvideo'], 'credits',
                 {"name": 'tester', "role": "testee"}, key_field='name')
-        self.get_item('videos', test_data['editvideo'], 'credits', pid)
-        self.patch_item('videos', test_data['editvideo'], 'credits', pid, {'role': 'edited text'})
-        self.delete_item('videos', test_data['editvideo'], 'credits', pid)
+        self.get_item('videos', prod_data['editvideo'], 'credits', pid)
+        self.patch_item('videos', prod_data['editvideo'], 'credits', pid, {'role': 'edited text'})
+        self.delete_item('videos', prod_data['editvideo'], 'credits', pid)
 
     def test_video_likes(self):
-        self.multi_lookup('videos', test_data['editvideo'], 'likes')
+        self.multi_lookup('videos', prod_data['editvideo'], 'likes')
 
     def test_video_presets(self):
-        self.put_item('videos', test_data['editvideo'], 'presets', test_data['presets'], check_get=False)
-        self.exists('videos', test_data['editvideo'], 'presets', test_data['presets'])
-        self.delete_item('videos', test_data['editvideo'], 'presets', test_data['presets'], check_get=False)
+        self.put_item('videos', prod_data['editvideo'], 'presets', prod_data['presets'], check_get=False)
+        self.exists('videos', prod_data['editvideo'], 'presets', prod_data['presets'])
+        self.delete_item('videos', prod_data['editvideo'], 'presets', prod_data['presets'], check_get=False)
 
     def test_video_stats(self):
-        stats = vimeo.videos.get(test_data['editvideo']).stats()
+        stats = vimeo.videos.get(prod_data['editvideo']).stats()
         assert 'stats' in stats['body']
 
     def test_video_tags(self):
         testtag = "krumping"
-        vimeo.videos.get(test_data['editvideo']).tags.put(testtag)
-        vimeo.videos.get(test_data['editvideo']).tags.get(testtag)
+        vimeo.videos.get(prod_data['editvideo']).tags.put(testtag)
+        vimeo.videos.get(prod_data['editvideo']).tags.get(testtag)
         assert True, "Tag PUT should be able to add a tag"
-        vimeo.videos.get(test_data['editvideo']).tags.delete(testtag)
+        vimeo.videos.get(prod_data['editvideo']).tags.delete(testtag)
         with pytest.raises(Exception):
-            vimeo.videos.get(test_data['editvideo']).tags.get(testtag)
+            vimeo.videos.get(prod_data['editvideo']).tags.get(testtag)
 
-        self.multi_lookup('videos', test_data['editvideo'], 'tags')
+        self.multi_lookup('videos', prod_data['editvideo'], 'tags')
 
-        vimeo.videos.get(test_data['editvideo']).tags.putmulti(['testone', 'testtwo'])
-        vimeo.videos.get(test_data['editvideo']).tags.get('testone')
+        vimeo.videos.get(prod_data['editvideo']).tags.putmulti(['testone', 'testtwo'])
+        vimeo.videos.get(prod_data['editvideo']).tags.get('testone')
         with pytest.raises(Exception):
-            vimeo.videos.get(test_data['editvideo']).tags.get(testtag)
+            vimeo.videos.get(prod_data['editvideo']).tags.get(testtag)
         assert True, "Tags PUT should replace all tags"
 
 @pytest.mark.usefixtures("setup")
@@ -438,14 +441,14 @@ class TestAlbum(VimeoObjectTest):
             vimeo.albums()
 
     def test_album_single(self):
-        self.single_lookup('albums', test_data['album'])
+        self.single_lookup('albums', prod_data['album'])
 
     def test_album_video(self):
-        self.multi_lookup('albums', test_data['album'], 'videos')
+        self.multi_lookup('albums', prod_data['album'], 'videos')
 
-        testvideo = test_data['editvideo'].strip("v")
-        self.put_item('albums', test_data['album'], 'videos', testvideo)
-        self.delete_item('albums', test_data['album'], 'videos', testvideo)
+        testvideo = prod_data['editvideo'].strip("v")
+        self.put_item('albums', prod_data['album'], 'videos', testvideo)
+        self.delete_item('albums', prod_data['album'], 'videos', testvideo)
 
 @pytest.mark.usefixtures("setup")
 class TestChannel(VimeoObjectTest):
@@ -463,25 +466,25 @@ class TestChannel(VimeoObjectTest):
             assert cid not in channel['link'], "Channels should be able to delete channels"
 
     def test_channels_single(self):
-        self.single_lookup('channels', test_data['channel'])
+        self.single_lookup('channels', prod_data['channel'])
         editname = 'iwasedited'
-        vimeo.channels.get(test_data['channel']).patch({'name': editname})
+        vimeo.channels.get(prod_data['channel']).patch({'name': editname})
         r = vimeo.channels()
         for channel in r['body']['data']:
-            if test_data['channel'] in channel['link']:
+            if prod_data['channel'] in channel['link']:
                 assert channel['name'] == editname
         # reset for next run
-        vimeo.channels.get(test_data['channel']).patch({'name': 'somethingelse'})
+        vimeo.channels.get(prod_data['channel']).patch({'name': 'somethingelse'})
 
     def test_channel_users(self):
-        self.multi_lookup('channels', test_data['channel'], 'users')
+        self.multi_lookup('channels', prod_data['channel'], 'users')
 
     def test_channel_videos(self):
-        self.multi_lookup('channels', test_data['channel'], 'videos')
+        self.multi_lookup('channels', prod_data['channel'], 'videos')
 
-        testvideo = test_data['editvideo'].strip("v")
-        self.put_item('channels', test_data['channel'], 'videos', testvideo)
-        self.delete_item('channels', test_data['channel'], 'videos', testvideo)
+        testvideo = prod_data['editvideo'].strip("v")
+        self.put_item('channels', prod_data['channel'], 'videos', testvideo)
+        self.delete_item('channels', prod_data['channel'], 'videos', testvideo)
 
 
 @pytest.mark.usefixtures("setup")
@@ -500,17 +503,17 @@ class TestGroup(VimeoObjectTest):
             assert gid not in group['link'], "Groups should be able to delete groups"
 
     def test_group_single(self):
-        self.single_lookup('groups', test_data['group'])
+        self.single_lookup('groups', prod_data['group'])
 
     def test_group_users(self):
-        self.multi_lookup('groups', test_data['group'], 'users')
+        self.multi_lookup('groups', prod_data['group'], 'users')
 
     def test_group_videos(self):
-        self.multi_lookup('groups', test_data['group'], 'videos')
+        self.multi_lookup('groups', prod_data['group'], 'videos')
 
-        testvideo = test_data['editvideo'].strip("v")
-        self.put_item('groups', test_data['mygroup'], 'videos', testvideo)
-        self.delete_item('groups', test_data['mygroup'], 'videos', testvideo)
+        testvideo = prod_data['editvideo'].strip("v")
+        self.put_item('groups', prod_data['mygroup'], 'videos', testvideo)
+        self.delete_item('groups', prod_data['mygroup'], 'videos', testvideo)
 
 
 @pytest.mark.usefixtures("setup")
@@ -520,19 +523,19 @@ class TestCategory(VimeoObjectTest):
         self.search('categories', 'test')
 
     def test_category_single(self):
-        self.single_lookup('categories', test_data['category'])
+        self.single_lookup('categories', prod_data['category'])
 
     def test_category_channels(self):
-        self.multi_lookup('categories', test_data['category'], 'channels')
+        self.multi_lookup('categories', prod_data['category'], 'channels')
 
     def test_category_groups(self):
-        self.multi_lookup('categories', test_data['category'], 'groups')
+        self.multi_lookup('categories', prod_data['category'], 'groups')
 
     def test_category_users(self):
-        self.multi_lookup('categories', test_data['category'], 'users')
+        self.multi_lookup('categories', prod_data['category'], 'users')
 
     def test_category_videos(self):
-        self.multi_lookup('categories', test_data['category'], 'videos')
+        self.multi_lookup('categories', prod_data['category'], 'videos')
 
 @pytest.mark.usefixtures("setup")
 class TestUpload(VimeoObjectTest):
@@ -541,7 +544,7 @@ class TestUpload(VimeoObjectTest):
         def hook(_range):
             assert _range > 0, "Uploading with a post-check hook should call the hook"
         try:
-            uid = vimeo.upload(test_data['uploadvideo'], post_check_hook=hook)
+            uid = vimeo.upload(prod_data['uploadvideo'], post_check_hook=hook)
         except IOError:
             raise IOError("You must create a file in your cwd called testupload.mp4 in order to test uploads")
         total = vimeo.me.videos()['body']['total']
