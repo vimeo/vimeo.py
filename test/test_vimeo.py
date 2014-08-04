@@ -311,7 +311,7 @@ class TestUser(VimeoObjectTest):
         r = user.portfolios.get("test-portfolio")()
         assert True, "User portfolio should work with hyphen"
 
-        pytest.skip(msg="User portfolios endpoint not found in prod")
+        pytest.skip(msg="User portfolios endpoint not found")
 
         r = user.portfolios.get(data['portfolio']).videos.get("70429873")()
         assert r['body'], "User portfolio video lookup should return an object"
