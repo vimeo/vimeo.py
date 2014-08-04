@@ -104,7 +104,7 @@ class Uploader():
         """
         r = HTTPClient().fetch(self.config['apiroot'] + self.ticket_path, method="POST",
                 body=urlencode({'type': 'streaming'}), headers = self.standard_headers,
-                validate_cert=not self.config['dev'])
+                validate_cert=True)
         response = json.loads(r.body)
         return response['ticket_id'], response['upload_link_secure'], response['complete_uri']
 
@@ -178,7 +178,7 @@ class Uploader():
         url = self.config['apiroot'] + complete_uri
         log.info("Requesting %s" % url)
         r = HTTPClient().fetch(url, method="DELETE", headers=self.standard_headers,
-                               validate_cert=not self.config['dev'])
+                               validate_cert=True)
         log.info("Upload completed: status code: %d" % r.code)
         if r.code == 201:
             _id = r.headers['location'].split('/')[-1]
@@ -215,19 +215,19 @@ class PictureUploader():
 
     def create_picture(self, path):
         r = HTTPClient().fetch(self.config['apiroot'] + path, method="POST", body="",
-            headers = self.standard_headers, validate_cert=not self.config['dev'])
+            headers = self.standard_headers, validate_cert=True)
         response = json.loads(r.body)
         return response['link'], response['uri']
 
     def upload_file(self, target, body):
         r = HTTPClient().fetch(target, method="PUT", body=body,
-            validate_cert=not self.config['dev'])
+            validate_cert=True)
         response = json.loads(r.body)
         return response['Status'] == 'success'
 
     def activate_picture(self, path):
         r = HTTPClient().fetch(self.config['apiroot'] + path, method="PATCH", body='{"active": true}',
-            headers = self.standard_headers, validate_cert=not self.config['dev'])
+            headers = self.standard_headers, validate_cert=True)
         return r.code == 200 or r.code == 204
 
     def read_file(self, filename):

@@ -258,7 +258,7 @@ class VimeoResource(object):
 
             AsyncHTTPClient().fetch(url,
                 __callback, method=method, headers=headers,
-                validate_cert=not self.config['dev'], body=body)
+                validate_cert=True, body=body)
             log.info("IOLoop running: %s" % tornado.ioloop.IOLoop.instance()._running)
             self._should_stop_ioloop_on_finish = True
             if tornado.ioloop.IOLoop.instance()._running:
@@ -268,7 +268,7 @@ class VimeoResource(object):
             return
         else:
             result = HTTPClient().fetch(url, method=method, headers=headers,
-                                        validate_cert=not self.config['dev'], body=body)
+                                        validate_cert=True, body=body)
             return self._parse_response_body(result.body, headers=result.headers)
 
     def _set_auth_markers(self, url, headers):
