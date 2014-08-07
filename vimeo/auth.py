@@ -99,7 +99,7 @@ def get_access_token(auth_code, cid, secret, redirect, api_root='https://api.vim
                           method="POST",
                           headers=headers,
                           body=urllib.urlencode(payload),
-                          validate_cert=False)
+                          validate_cert=True)
     if response.error:
         raise ValueError(response.error)
     else:
