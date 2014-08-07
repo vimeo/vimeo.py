@@ -81,11 +81,11 @@ def get_access_token(auth_code, cid, secret, redirect, api_root='https://api.vim
     Args:
     auth_code   - The authorization code given in the 'code' query parameter of the
                   page URI after redirecting from the result of get_auth_url
-    api_root    - The root url of the API being used (in VimeoClient, accessible via
-                  config['apiroot']
     cid         - The client ID for the current app
     secret      - The client secret for the current app
     redirect    - The redirect URI for the app (see note)
+    api_root    - The root url of the API being used (in VimeoClient, accessible via
+                  config['apiroot']
     """
     encoded = base64.b64encode("%s:%s" % (cid, secret))
 
