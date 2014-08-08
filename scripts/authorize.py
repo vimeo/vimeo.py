@@ -52,7 +52,7 @@ if __name__ == "__main__":
         print "Visit %s in a browser" % get_auth_url(api_root, cid, scopes, redirect)
         auth_code = raw_input("Enter auth code: ")
 
-        return get_access_token(auth_code, api_root, cid, secret, redirect)
+        return get_access_token(auth_code, cid, secret, redirect, api_root)
 
     print "Access token is %s" % do_auth_flow(api_root, args.cid[0],
                                               args.secret[0], args.scopes,
