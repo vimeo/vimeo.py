@@ -22,7 +22,7 @@ import argparse
 import os,sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
-from vimeo.auth import get_auth_url, get_client_credentials
+from vimeo.auth import get_client_credentials
 
 
 """
@@ -47,8 +47,5 @@ if __name__ == "__main__":
 
     api_root = args.api_root[0]
 
-    def do_auth_flow(cid, secret, scopes, api_root):
-        return get_client_credentials(cid, secret, scopes, api_root)
-
-    print "Client token is %s" % do_auth_flow(args.cid[0], args.secret[0],
-                                              args.scopes, api_root)
+    print "Client token is %s" % get_client_credentials(args.cid[0], args.secret[0],
+                                                        args.scopes, api_root)
