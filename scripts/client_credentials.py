@@ -40,11 +40,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate an API access token')
     parser.add_argument('--cid', '-i', help="Your client ID", nargs=1, required=True)
     parser.add_argument('--secret', '-s', help="Your client secret", nargs=1, required=True)
+    parser.add_argument('--api-root', '-a', help="The api root to use",
+                        nargs=1, required=False)
     parser.add_argument('--scopes', '-o', help="Your requested scopes",
                         nargs=argparse.REMAINDER, required=False)
     args = parser.parse_args()
 
-    api_root = "http://api.vimeo.com"
+    api_root = args.api_root[0]
 
     def do_auth_flow(api_root, cid, secret, scopes, redirect):
         print "Visit %s in a browser" % get_auth_url(api_root, cid, scopes, redirect)
