@@ -16,14 +16,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the license.
 """
-
 import argparse
 
 # Load in Vimeo auth info, requires adding parent dir to import paths.
 import os,sys
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
-from vimeo.auth import get_client_credentials
+from vimeo.auth import get_auth_url, get_client_credentials
 
 
 """
@@ -48,12 +47,8 @@ if __name__ == "__main__":
 
     api_root = args.api_root[0]
 
-    def do_auth_flow(api_root, cid, secret, scopes, redirect):
-        print "Visit %s in a browser" % get_auth_url(api_root, cid, scopes, redirect)
-        auth_code = raw_input("Enter auth code: ")
+    def do_auth_flow(cid, secret, scopes, api_root):
+        return get_client_credentials(cid, secret, scopes, api_root)
 
-        return get_access_token(auth_code, api_root, cid, secret, redirect)
-
-    print "Client token is %s" % get_client_credentials(args.cid[0],
-                                              args.secret[0], scopes=args.scopes,
-                                              api_root=api_root)
+    print "Client token is %s" % do_auth_flow(args.cid[0], args.secret[0],
+                                              args.scopes, api_root)
