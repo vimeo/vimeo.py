@@ -212,6 +212,8 @@ class Video(SingularResource):
                              'multi_put': True},
                 'stats'   : {'methods': ["GET"],
                              'accept': 'stats'},
+                'pictures': {'methods': ["GET", "POST", "PATCH"],
+                             'accept': 'picture'},
         })
 
 mapper = {

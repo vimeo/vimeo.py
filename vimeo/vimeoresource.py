@@ -224,7 +224,7 @@ class VimeoResource(object):
         elif hasattr(self, 'accept'):
             accept = self.accept
 
-        headers = {"Accept": 'application/vnd.vimeo.%s+json; v3.0' % accept,
+        headers = {"Accept": config['accept'],
                    "User-Agent": config['user-agent']}
 
         # HTTPClient doesn't like when requests with these methods have bodies
