@@ -132,7 +132,7 @@ class Uploader():
         log.info("Requesting %s" % upload_uri)
         request_headers = dict(upload_headers.items() + self.standard_headers.items())
         r = HTTPClient().fetch(upload_uri, method="PUT",
-                               body=data, headers=request_headers)
+                               body=data, headers=request_headers, request_timeout=0)
         log.info("Uploaded segment: status code %d" % r.code)
         if r.code != 200:
             raise ValueError("Upload unsuccessful")
