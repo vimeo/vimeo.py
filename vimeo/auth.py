@@ -19,7 +19,12 @@ under the license.
 
 import urllib
 import base64
-import json
+
+try: 
+    import simplejson as json
+except ImportError: 
+    import json
+
 from copy import copy
 
 from tornado.httpclient import HTTPClient

@@ -17,7 +17,12 @@ specific language governing permissions and limitations
 under the license.
 """
 import logging as log
-import json
+
+try: 
+    import simplejson as json
+except ImportError: 
+    import json
+
 from urllib import urlencode
 
 from tornado.httpclient import HTTPClient, HTTPError
