@@ -226,8 +226,10 @@ class PictureUploader():
         return response['Status'] == 'success'
 
     def activate_picture(self, path):
-        r = HTTPClient().fetch(self.config['apiroot'] + path, method="PATCH", body='{"active": true}',
-            headers = self.standard_headers, validate_cert=True)
+        self.standard_headers["Content-Type"] = "application/json"
+        r = HTTPClient().fetch(self.config['apiroot'] + path, method="PATCH",
+                               body=json.dumps({"active": True}),
+        headers = self.standard_headers, validate_cert=True)
         return r.code == 200 or r.code == 204
 
     def read_file(self, filename):
