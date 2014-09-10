@@ -44,7 +44,7 @@ The authorization process involves asking Vimeo for an authentication token and
 then using that authentication token to request the access token.
 
 To do this offline, use the script at `scripts/authorize.py`. It requires a few
-different arguments, including a list of [scopes](https://developer.vimeo.com/api/docs/auth)
+different arguments, including a list of [scopes](https://developer.vimeo.com/api/authentication#scopes)
 requested for the newly created token.
 
     python authorize.py -i #my#client#id# -s #my#client#secret# -r http://mya.pp/callback/url -o public private
