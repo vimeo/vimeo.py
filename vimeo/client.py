@@ -4,8 +4,9 @@
 from functools import wraps
 import requests
 from auth.client_credentials import ClientCredentialsMixin
+from auth.authorization_code import AuthorizationCodeMixin
 
-class VimeoClient(ClientCredentialsMixin):
+class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin):
     """Client handle for the Vimeo API."""
 
     API_ROOT = "https://api.vimeo.com"
