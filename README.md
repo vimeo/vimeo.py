@@ -25,6 +25,7 @@ Note:  You can find the app tokens and an authenticated bearer token in the "OAu
 ### Authenticating
 
 There are two main types of authentication in the Vimeo API:
+
 0. Client Credentials: A token that is specific to your app and NOT a user.
 0. Authorization Code: A token that is for your app, but has the ability to act on behalf of the authorizing user.
 
