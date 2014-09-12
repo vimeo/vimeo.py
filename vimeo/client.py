@@ -5,8 +5,9 @@ from functools import wraps
 import requests
 from auth.client_credentials import ClientCredentialsMixin
 from auth.authorization_code import AuthorizationCodeMixin
+from upload import UploadMixin
 
-class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin):
+class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     """Client handle for the Vimeo API."""
 
     API_ROOT = "https://api.vimeo.com"
@@ -37,12 +38,13 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin):
         From here we can apply the authentication information we have.
         """
         if name not in self.HTTP_METHODS:
-            return
+            raise AttributeError("%r is not an HTTP method" % name)
 
         # Get the Requests based function to use to preserve their defaults.
         request_func = getattr(requests, name, None)
         if request_func is None:
-            return
+            raise AttributeError("%r could not be found in the backing lib"
+                % name)
 
         @wraps(request_func)
         def caller(url, *args, **kwargs):
@@ -50,8 +52,11 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin):
             headers = kwargs.get('headers', dict())
             headers['Accept'] = self.ACCEPT_HEADER
 
+            if not url[:4] == "http":
+                url = self.API_ROOT + url
+
             return request_func(
-                self.API_ROOT + url,
+                url,
                 auth=self._token,
                 *args, **kwargs)
 
