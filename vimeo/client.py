@@ -51,6 +51,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
             """Hand off the call to Requests."""
             headers = kwargs.get('headers', dict())
             headers['Accept'] = self.ACCEPT_HEADER
+            kwargs['headers'] = headers
 
             if not url[:4] == "http":
                 url = self.API_ROOT + url

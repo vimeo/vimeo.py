@@ -3,8 +3,8 @@
 
 import os
 
-class UploadMixin(object):
-    """Handle uploading to the Vimeo API."""
+class UploadVideoMixin(object):
+    """Handle uploading a new video to the Vimeo API."""
 
     UPLOAD_ENDPOINT = '/me/videos'
 
@@ -60,3 +60,43 @@ class UploadMixin(object):
             }, data=f)
 
         assert response.status_code == 200, "Unexpected status code on upload."
+
+class UploadPictureMixin(object):
+    """Functionality for uploading a picture to Vimeo for another object
+    (video, user, etc).
+    """
+
+    def upload_picture(self, obj, filename, activate=False):
+        """Upload a picture for the object.
+
+        The object (obj) can be the URI for the object or the response/parsed
+        json for it.
+        """
+        if isinstance(obj, basestring):
+            # TODO:  Add filtering down to just the picture connection field.
+            obj = self.get(obj)
+            assert obj.status_code == 200, "Failed to load the target object."
+            obj = obj.json()
+
+        # Get the picture object.
+        picture = self.post(obj['metadata']['connections']['pictures']['uri'])
+
+        assert picture.status_code == 201, \
+            "Failed to create a new picture with Vimeo."
+
+        picture = picture.json()
+
+        with open(filename) as f:
+            upload_resp = self.put(picture['link'], data=f)
+        assert upload_resp.status_code == 200, "Failed uploading"
+
+        if activate:
+            active = self.patch(picture['uri'], data={"active": "true"})
+            assert active.status_code == 200, "Failed activating"
+            picture['active'] = True
+
+        return picture
+
+class UploadMixin(UploadVideoMixin, UploadPictureMixin):
+    """Handle uploading to the Vimeo API."""
+    pass
