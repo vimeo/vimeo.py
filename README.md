@@ -85,7 +85,7 @@ v = vimeo.VimeoClient(
     key=YOUR_API_TOKEN,
     secret=YOUR_TOKEN_SECRET)
 
-v.upload('your-filename.mp4')
+video_uri = v.upload('your-filename.mp4')
 ```
 
 ### Uploading a picture
