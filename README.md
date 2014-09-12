@@ -75,3 +75,15 @@ token, user, scope = v.exchange_code(CODE_FROM_URL, 'https://example.com')
 ```
 
 This process is generally quite simple, but it does require a little more effort than the client credentials grant to make work properly.  Remember that you may ask for scopes that the user decides *not* to give you, and your application must gracefully handle that.
+
+### Uploading a new video
+
+Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away.  Internally, this library will provide the `streaming` upload and send a local file to the server.
+
+```python
+v = vimeo.VimeoClient(
+    key=YOUR_API_TOKEN,
+    secret=YOUR_TOKEN_SECRET)
+
+v.upload('your-filename.mp4')
+```
