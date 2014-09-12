@@ -12,12 +12,20 @@ class VimeoClient(object):
 
     def __init__(self, token=None, key=None, secret=None, *args, **kwargs):
         """Prep the handle with the authentication information."""
-        self.token = BearerToken(token) if token else None
+        self.token = token
         self.app_info = (key, secret)
         self._requests_methods = dict()
 
         # Make sure we have enough info to be useful.
         assert token is not None or (key is not None and secret is not None)
+
+    # Internally we back this with an auth mechanism for Requests.
+    @property
+    def token(self):
+        return self._token.token
+    @token.setter
+    def token(self, value):
+        self._token = _BearerToken(value) if value else None
 
     def __getattr__(self, name):
         """This is where we get the function for the verb that was just
@@ -38,12 +46,12 @@ class VimeoClient(object):
             """Hand off the call to Requests."""
             return request_func(
                 self.API_ROOT + url,
-                auth=self.token,
+                auth=self._token,
                 *args, **kwargs)
 
         return caller
 
-class BearerToken(requests.auth.AuthBase):
+class _BearerToken(requests.auth.AuthBase):
     """Model the bearer token and apply it to the request."""
     def __init__(self, token):
         self.token = token
