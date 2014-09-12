@@ -11,6 +11,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin):
 
     API_ROOT = "https://api.vimeo.com"
     HTTP_METHODS = {'head', 'get', 'post', 'put', 'patch', 'options', 'delete'}
+    ACCEPT_HEADER = "application/vnd.vimeo.*;version=3.2"
 
     def __init__(self, token=None, key=None, secret=None, *args, **kwargs):
         """Prep the handle with the authentication information."""
@@ -46,6 +47,9 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin):
         @wraps(request_func)
         def caller(url, *args, **kwargs):
             """Hand off the call to Requests."""
+            headers = kwargs.get('headers', dict())
+            headers['Accept'] = self.ACCEPT_HEADER
+
             return request_func(
                 self.API_ROOT + url,
                 auth=self._token,
