@@ -28,6 +28,18 @@ class AuthorizationCodeMixin(AuthenticationMixinBase):
 
         return url + urllib.urlencode(query)
 
-    def exchange_code(self, code):
+    def exchange_code(self, code, redirect):
         """Perform the exchange step for the code from the redirected user."""
-        # TODO.
+        code, headers, resp = self.call_grant('/oauth/access_token',
+            {
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": redirect
+            })
+
+        if not code == 200:
+            raise GrantFailed()
+
+        self.token = resp['access_token']
+
+        return self.token, resp['user'], resp['scope']
