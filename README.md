@@ -87,3 +87,17 @@ v = vimeo.VimeoClient(
 
 v.upload('your-filename.mp4')
 ```
+
+### Uploading a picture
+
+Once you have an authenticated instance of the `VimeoClient` class, uploading a picture requires only the target object (for instance, the video for which you would like to replace the thumbnail).
+
+```python
+v = vimeo.VimeoClient(
+    key=YOUR_API_TOKEN,
+    secret=YOUR_TOKEN_SECRET)
+
+v.upload_picture('/videos/12345', 'your-image.jpg', activate=True)
+```
+
+Note:  This will make it the active picture for all users this way.  The `activate` keyword argument defaults to `False`, so without it you will need to activate the picture yourself.
