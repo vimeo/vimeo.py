@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-from functools import partial
+from functools import wraps
 import requests
 
 class VimeoClient(object):
@@ -33,7 +33,15 @@ class VimeoClient(object):
         if request_func is None:
             return
 
-        return partial(request_func, auth=self.token)
+        @wraps(request_func)
+        def caller(url, *args, **kwargs):
+            """Hand off the call to Requests."""
+            return request_func(
+                self.API_ROOT + url,
+                auth=self.token,
+                *args, **kwargs)
+
+        return caller
 
 class BearerToken(requests.auth.AuthBase):
     """Model the bearer token and apply it to the request."""
