@@ -23,8 +23,7 @@ class UploadVideoMixin(object):
         ticket = self.put(self.API_ROOT + video_uri + '/files',
                           data={'type': 'streaming',
                                 'redirect_url': redirect_url,
-                                'upgrade_to_1080':
-                                'true' if upgrade_to_1080 else 'false'})
+                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         assert ticket.status_code == 201, "Failed to create an upload ticket"
 
