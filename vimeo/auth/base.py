@@ -15,6 +15,10 @@ class AuthenticationMixinBase(object):
 
         resp = requests.post(self.API_ROOT + path,
             auth=self.app_info,
+            headers={
+                'Accept': self.ACCEPT_HEADER,
+                'User-Agent': self.USER_AGENT
+            },
             data=data)
 
         return resp.status_code, resp.headers, resp.json()
