@@ -3,6 +3,7 @@
 
 import os
 
+
 class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
 
@@ -14,6 +15,23 @@ class UploadVideoMixin(object):
 
         assert ticket.status_code == 201, "Failed to create an upload ticket"
 
+        self._perform_upload(filename, ticket)
+
+    def replace(self, video_uri, filename, redirect_url,
+                upgrade_to_1080=False):
+        """Replace the video at the given uri with the named source file."""
+        ticket = self.put(self.API_ROOT + video_uri + '/files',
+                          data={'type': 'streaming',
+                                'redirect_url': redirect_url,
+                                'upgrade_to_1080':
+                                'true' if upgrade_to_1080 else 'false'})
+
+        assert ticket.status_code == 201, "Failed to create an upload ticket"
+
+        self._perform_upload(filename, ticket)
+
+    def _perform_upload(self, filename, ticket):
+        """Take an upload ticket and perform the actual upload."""
         ticket = ticket.json()
 
         # Perform the actual upload.
@@ -61,6 +79,7 @@ class UploadVideoMixin(object):
 
         assert response.status_code == 200, "Unexpected status code on upload."
 
+
 class UploadPictureMixin(object):
     """Functionality for uploading a picture to Vimeo for another object
     (video, user, etc).
@@ -96,6 +115,7 @@ class UploadPictureMixin(object):
             picture['active'] = True
 
         return picture
+
 
 class UploadMixin(UploadVideoMixin, UploadPictureMixin):
     """Handle uploading to the Vimeo API."""
