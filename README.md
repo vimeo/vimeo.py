@@ -102,3 +102,7 @@ v.upload_picture('/videos/12345', 'your-image.jpg', activate=True)
 ```
 
 Note:  This will make it the active picture for all users this way.  The `activate` keyword argument defaults to `False`, so without it you will need to activate the picture yourself.
+
+# Legacy Python Library
+
+An earlier version of this library used a more complicated ORM syntax.  This library is still available from this github repo via the [orm-tornado](https://github.com/vimeo/vimeo.py/releases/tag/orm-tornado) tag.
