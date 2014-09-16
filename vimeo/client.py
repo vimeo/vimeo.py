@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from functools import wraps
+import json
 import requests
 from auth.client_credentials import ClientCredentialsMixin
 from auth.authorization_code import AuthorizationCodeMixin
@@ -48,15 +49,21 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
                 % name)
 
         @wraps(request_func)
-        def caller(url, **kwargs):
+        def caller(url, jsonify=True, **kwargs):
             """Hand off the call to Requests."""
             headers = kwargs.get('headers', dict())
             headers['Accept'] = self.ACCEPT_HEADER
             headers['User-Agent'] = self.USER_AGENT
-            kwargs['headers'] = headers
+
+            if jsonify \
+                    and 'data' in kwargs \
+                    and isinstance(kwargs['data'], (dict, list)):
+                kwargs['data'] = json.dumps(kwargs['data'])
+                headers['Content-Type'] = 'application/json'
 
             kwargs['timeout'] = kwargs.get('timeout', (1, 30))
             kwargs['auth'] = kwargs.get('auth', self._token)
+            kwargs['headers'] = headers
 
             if not url[:4] == "http":
                 url = self.API_ROOT + url
