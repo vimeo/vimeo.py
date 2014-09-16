@@ -48,7 +48,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
                 % name)
 
         @wraps(request_func)
-        def caller(url, *args, **kwargs):
+        def caller(url, **kwargs):
             """Hand off the call to Requests."""
             headers = kwargs.get('headers', dict())
             headers['Accept'] = self.ACCEPT_HEADER
@@ -56,14 +56,14 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
             kwargs['headers'] = headers
 
             kwargs['timeout'] = kwargs.get('timeout', (1, 30))
+            kwargs['auth'] = kwargs.get('auth', self._token)
 
             if not url[:4] == "http":
                 url = self.API_ROOT + url
 
             return request_func(
                 url,
-                auth=self._token,
-                *args, **kwargs)
+                **kwargs)
 
         return caller
 

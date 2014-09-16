@@ -13,12 +13,8 @@ class AuthenticationMixinBase(object):
         """
         assert self.app_info[0] is not None and self.app_info[1] is not None
 
-        resp = requests.post(self.API_ROOT + path,
+        resp = self.post(path,
             auth=self.app_info,
-            headers={
-                'Accept': self.ACCEPT_HEADER,
-                'User-Agent': self.USER_AGENT
-            },
             data=data)
 
         return resp.status_code, resp.headers, resp.json()
