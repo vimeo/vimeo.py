@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import os
+import requests.exceptions
 
 class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
@@ -22,7 +23,12 @@ class UploadVideoMixin(object):
         last_byte = 0
         with open(filename) as f:
             while last_byte < size:
-                self._make_pass(target, f, size, last_byte)
+                try:
+                    self._make_pass(target, f, size, last_byte)
+                except requests.exceptions.Timeout:
+                    # If there is a timeout here, we are okay with it, since
+                    # we'll check and resume.
+                    pass
                 last_byte = self._get_progress(target, size)
 
         # Perform the finalization and get the location.

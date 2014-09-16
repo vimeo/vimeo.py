@@ -55,6 +55,8 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
             headers['User-Agent'] = self.USER_AGENT
             kwargs['headers'] = headers
 
+            kwargs['timeout'] = kwargs.get('timeout', (1, 30))
+
             if not url[:4] == "http":
                 url = self.API_ROOT + url
 
