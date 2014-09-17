@@ -94,10 +94,11 @@ video_uri = v.upload('your-filename.mp4')
 Once you have an authenticated instance of the `VimeoClient` class, you can also replace the source file of an existing video.
 
 ```
-video_uri = v.replace(video_uri='video_uri', 
-                      filename='your-filename.mp4',
-                      redirect_url='redirect_url',
-                      upgrade_to_1080=False)
+video_uri = v.replace(
+    video_uri='video_uri', 
+    filename='your-filename.mp4',
+    redirect_url='redirect_url',
+    upgrade_to_1080=False)
 ```
 
 ### Uploading a picture
