@@ -89,6 +89,17 @@ v = vimeo.VimeoClient(
 video_uri = v.upload('your-filename.mp4')
 ```
 
+##### Replacing video source file
+
+Once you have an authenticated instance of the `VimeoClient` class, you can also replace the source file of an existing video.
+
+```
+video_uri = v.replace(
+    video_uri='video_uri', 
+    filename='your-filename.mp4',
+    upgrade_to_1080=False)
+```
+
 ### Uploading a picture
 
 Once you have an authenticated instance of the `VimeoClient` class, uploading a picture requires only the target object (for instance, the video for which you would like to replace the thumbnail).
