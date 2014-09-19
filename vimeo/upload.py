@@ -8,29 +8,29 @@ class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
 
     UPLOAD_ENDPOINT = '/me/videos'
+    REPLACE_ENDPOINT = '{video_uri}/files'
 
     def upload(self, filename):
         """Upload the named file to Vimeo."""
         ticket = self.post(self.UPLOAD_ENDPOINT, data={'type': 'streaming'})
 
-        assert ticket.status_code == 201, "Failed to create an upload ticket"
-
         self._perform_upload(filename, ticket)
 
-    def replace(self, video_uri, filename, redirect_url,
-                upgrade_to_1080=False):
+    def replace(self, video_uri, filename, upgrade_to_1080=False):
         """Replace the video at the given uri with the named source file."""
-        ticket = self.put(self.API_ROOT + video_uri + '/files',
-                          data={'type': 'streaming',
-                                'redirect_url': redirect_url,
-                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+        uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
-        assert ticket.status_code == 201, "Failed to create an upload ticket"
+        ticket = self.put(uri,
+                          data={'type': 'streaming',
+                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         self._perform_upload(filename, ticket)
 
     def _perform_upload(self, filename, ticket):
         """Take an upload ticket and perform the actual upload."""
+
+        assert ticket.status_code == 201, "Failed to create an upload ticket"
+
         ticket = ticket.json()
 
         # Perform the actual upload.
