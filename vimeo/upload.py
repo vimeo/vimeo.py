@@ -10,9 +10,11 @@ class UploadVideoMixin(object):
     UPLOAD_ENDPOINT = '/me/videos'
     REPLACE_ENDPOINT = '{video_uri}/files'
 
-    def upload(self, filename):
+    def upload(self, filename, upgrade_to_1080=False):
         """Upload the named file to Vimeo."""
-        ticket = self.post(self.UPLOAD_ENDPOINT, data={'type': 'streaming'})
+        ticket = self.post(self.UPLOAD_ENDPOINT,
+                          data={'type': 'streaming',
+                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         self._perform_upload(filename, ticket)
 
