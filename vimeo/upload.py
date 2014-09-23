@@ -17,7 +17,7 @@ class UploadVideoMixin(object):
                           data={'type': 'streaming',
                                 'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
-        self._perform_upload(filename, ticket)
+        return self._perform_upload(filename, ticket)
 
     def replace(self, video_uri, filename, upgrade_to_1080=False):
         """Replace the video at the given uri with the named source file."""
@@ -27,7 +27,7 @@ class UploadVideoMixin(object):
                           data={'type': 'streaming',
                                 'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
-        self._perform_upload(filename, ticket)
+        return self._perform_upload(filename, ticket)
 
     def _perform_upload(self, filename, ticket):
         """Take an upload ticket and perform the actual upload."""
