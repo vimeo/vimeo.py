@@ -123,7 +123,34 @@ class UploadPictureMixin(object):
 
         return picture
 
+class UploadTexttrackMixin(object):
+    """Functionality for uploading a texttrack to Vimeo for a video.
+    """
+    TEXTRACK_ENDPOINT = '{video_uri}/texttracks'
 
-class UploadMixin(UploadVideoMixin, UploadPictureMixin):
+    def upload_texttrack(self, video_uri, track_type, language, filename):
+        """Upload a texttrack for the object.
+        """
+        uri = self.TEXTRACK_ENDPOINT.format(video_uri=video_uri)
+        name = filename.split('/')[-1]
+
+        texttrack = self.post(uri,
+                              data={'type': track_type,
+                                    'language': language,
+                                    'name': name})
+
+        assert texttrack.status_code == 201, \
+            "Failed to create a new texttrack with Vimeo."
+
+        texttrack = texttrack.json()
+
+        with open(filename) as f:
+            upload_resp = self.put(texttrack['link'], data=f)
+        assert upload_resp.status_code == 200, "Failed uploading"
+
+        return texttrack
+
+
+class UploadMixin(UploadVideoMixin, UploadPictureMixin, UploadTexttrackMixin):
     """Handle uploading to the Vimeo API."""
     pass
