@@ -126,12 +126,12 @@ class UploadPictureMixin(object):
 class UploadTexttrackMixin(object):
     """Functionality for uploading a texttrack to Vimeo for a video.
     """
-    TEXTRACK_ENDPOINT = '{video_uri}/texttracks'
+    TEXTTRACK_ENDPOINT = '{video_uri}/texttracks'
 
     def upload_texttrack(self, video_uri, track_type, language, filename):
         """Upload a texttrack for the object.
         """
-        uri = self.TEXTRACK_ENDPOINT.format(video_uri=video_uri)
+        uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
         name = filename.split('/')[-1]
 
         texttrack = self.post(uri,
