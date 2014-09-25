@@ -129,8 +129,7 @@ class UploadTexttrackMixin(object):
     TEXTTRACK_ENDPOINT = '{video_uri}/texttracks'
 
     def upload_texttrack(self, video_uri, track_type, language, filename):
-        """Upload a texttrack for the object.
-        """
+        """Upload the texttrack at the given uri with the named source file."""
         uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
         name = filename.split('/')[-1]
 
