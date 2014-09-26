@@ -93,7 +93,7 @@ video_uri = v.upload('your-filename.mp4')
 
 Once you have an authenticated instance of the `VimeoClient` class, you can also replace the source file of an existing video.
 
-```
+```python
 video_uri = v.replace(
     video_uri='video_uri', 
     filename='your-filename.mp4',
@@ -113,6 +113,18 @@ v.upload_picture('/videos/12345', 'your-image.jpg', activate=True)
 ```
 
 Note:  This will make it the active picture for all users this way.  The `activate` keyword argument defaults to `False`, so without it you will need to activate the picture yourself.
+
+### Uploading a text track
+
+Once you have an authenticated instance of the `VimeoClient` class, uploading a text track requires the video uri of the video the text track will be added to, text track type, text track language, and text track filename.
+
+```python
+v = vimeo.VimeoClient(
+    key=YOUR_API_TOKEN,
+    secret=YOUR_TOKEN_SECRET)
+
+v.upload_texttrack('/videos/12345', 'captions', 'en-US', 'your-texttrack.vtt')
+```
 
 # Legacy Python Library
 
