@@ -14,5 +14,5 @@ setup(name='PyVimeo',
     author='Vimeo',
     author_email='support@vimeo.com',
     packages=['vimeo'],
-    install_requires=['requests'],
+    install_requires=['requests>=2.4.0'],
 )
