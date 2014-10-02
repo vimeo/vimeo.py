@@ -6,10 +6,8 @@ try:
 except ImportError:
     from distutils.core import setup
 
-import vimeo
-
 setup(name='PyVimeo',
-    version='.'.join(str(v) for v in vimeo.version),
+    version='0.1.1',
     description='Simple interaction with the Vimeo API.',
     author='Vimeo',
     author_email='support@vimeo.com',
