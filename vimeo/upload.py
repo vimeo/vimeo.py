@@ -14,8 +14,8 @@ class UploadVideoMixin(object):
     def upload(self, filename, upgrade_to_1080=False):
         """Upload the named file to Vimeo."""
         ticket = self.post(self.UPLOAD_ENDPOINT,
-                          data={'type': 'streaming',
-                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+            data={'type': 'streaming',
+                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         return self._perform_upload(filename, ticket)
 
@@ -24,8 +24,8 @@ class UploadVideoMixin(object):
         uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
         ticket = self.put(uri,
-                          data={'type': 'streaming',
-                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+            data={'type': 'streaming',
+                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         return self._perform_upload(filename, ticket)
 
