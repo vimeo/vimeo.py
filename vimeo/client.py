@@ -20,6 +20,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
         """Prep the handle with the authentication information."""
         self.token = token
         self.app_info = (key, secret)
+        self._timeout = kwargs.get('timeout', (1, 30))
         self._requests_methods = dict()
 
         # Make sure we have enough info to be useful.
@@ -61,7 +62,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
                 kwargs['data'] = json.dumps(kwargs['data'])
                 headers['Content-Type'] = 'application/json'
 
-            kwargs['timeout'] = kwargs.get('timeout', (1, 30))
+            kwargs['timeout'] = kwargs.get('timeout', self._timeout)
             kwargs['auth'] = kwargs.get('auth', self._token)
             kwargs['headers'] = headers
 
