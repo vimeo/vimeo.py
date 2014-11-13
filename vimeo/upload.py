@@ -79,6 +79,7 @@ class UploadVideoMixin(object):
         """
         response = self.put(
             upload_target,
+            timeout=None,
             headers={
                 'Content-Length': size,
                 'Content-Range': 'bytes: %d-%d/%d' % (last_byte, size, size)
