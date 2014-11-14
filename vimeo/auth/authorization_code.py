@@ -3,9 +3,15 @@
 
 from __future__ import absolute_import
 
-import urllib
 from .base import AuthenticationMixinBase
 from . import GrantFailed
+
+# We need to get urlencode from urllib.parse in Python 3, but fall back to
+# urllib in Python 2
+try:
+    from urllib.parse import urlencode
+except ImportError:
+    from urllib import urlencode
 
 try:
     basestring
@@ -33,7 +39,7 @@ class AuthorizationCodeMixin(AuthenticationMixinBase):
         if redirect:
             query['redirect_uri'] = redirect
 
-        return url + urllib.urlencode(query)
+        return url + urlencode(query)
 
     def exchange_code(self, code, redirect):
         """Perform the exchange step for the code from the redirected user."""
