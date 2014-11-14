@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+from __future__ import absolute_import
+
 import urllib
-from base import AuthenticationMixinBase
+from .base import AuthenticationMixinBase
 from . import GrantFailed
 
 class AuthorizationCodeMixin(AuthenticationMixinBase):

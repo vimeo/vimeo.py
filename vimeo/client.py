@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+from __future__ import absolute_import
+
 from functools import wraps
 import json
 import requests
-from auth.client_credentials import ClientCredentialsMixin
-from auth.authorization_code import AuthorizationCodeMixin
-from upload import UploadMixin
+from .auth.client_credentials import ClientCredentialsMixin
+from .auth.authorization_code import AuthorizationCodeMixin
+from .upload import UploadMixin
 
 class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     """Client handle for the Vimeo API."""
