@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-from base import AuthenticationMixinBase
+from __future__ import absolute_import
+
+from .base import AuthenticationMixinBase
 from . import GrantFailed
 
 class ClientCredentialsMixin(AuthenticationMixinBase):

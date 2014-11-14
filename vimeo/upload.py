@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+from __future__ import absolute_import
+
 import os
 import requests.exceptions
 
@@ -14,8 +16,8 @@ class UploadVideoMixin(object):
     def upload(self, filename, upgrade_to_1080=False):
         """Upload the named file to Vimeo."""
         ticket = self.post(self.UPLOAD_ENDPOINT,
-                          data={'type': 'streaming',
-                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+            data={'type': 'streaming',
+                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         return self._perform_upload(filename, ticket)
 
@@ -24,8 +26,8 @@ class UploadVideoMixin(object):
         uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
         ticket = self.put(uri,
-                          data={'type': 'streaming',
-                                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+            data={'type': 'streaming',
+                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         return self._perform_upload(filename, ticket)
 
@@ -79,6 +81,7 @@ class UploadVideoMixin(object):
         """
         response = self.put(
             upload_target,
+            timeout=None,
             headers={
                 'Content-Length': size,
                 'Content-Range': 'bytes: %d-%d/%d' % (last_byte, size, size)
