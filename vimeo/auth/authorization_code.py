@@ -7,6 +7,11 @@ import urllib
 from .base import AuthenticationMixinBase
 from . import GrantFailed
 
+try:
+    basestring
+except NameError:
+    basestring = str
+
 class AuthorizationCodeMixin(AuthenticationMixinBase):
     """Implement helpers for the Authorization Code grant for OAuth2."""
 
