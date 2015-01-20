@@ -68,7 +68,7 @@ class UploadVideoMixin(object):
         range_recv = progress_response.headers.get('Range', None)
         _, last_byte = range_recv.split('-')
 
-        return last_byte
+        return int(last_byte)
 
     def _make_pass(self, upload_target, f, size, last_byte):
         """Make a pass at uploading.
