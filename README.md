@@ -39,7 +39,11 @@ Retrieving a set of client credentials in this library is very, very easy.  You 
 v = vimeo.VimeoClient(
     key=YOUR_API_TOKEN,
     secret=YOUR_TOKEN_SECRET)
-token = v.load_client_credentials()
+
+try:
+    token = v.load_client_credentials()
+except vimeo.auth.GrantFailed:
+    # Handle the failure to get a token from the provided code and redirect.
 ```
 
 #### Authorization Code
@@ -70,7 +74,10 @@ v = vimeo.VimeoClient(
     secret=YOUR_TOKEN_SECRET)
 
 # You should retrieve the "code" from the URL string Vimeo redirected to.  Here that's named CODE_FROM_URL
-token, user, scope = v.exchange_code(CODE_FROM_URL, 'https://example.com')
+try:
+    token, user, scope = v.exchange_code(CODE_FROM_URL, 'https://example.com')
+except vimeo.auth.GrantFailed:
+    # Handle the failure to get a token from the provided code and redirect.
 
 # Store the token, scope and any additional user data you require in your database so users do not have to re-authorize your application repeatedly.
 ```
