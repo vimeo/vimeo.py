@@ -7,7 +7,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='PyVimeo',
-    version='0.2.0',
+    version='0.2.1',
     description='Simple interaction with the Vimeo API.',
     url='https://developer.vimeo.com/',
     author='Vimeo',
