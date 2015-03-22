@@ -22,6 +22,12 @@ print about_me.json()   # Load the body's JSON data.
 
 Note:  You can find the app tokens and an authenticated bearer token in the "OAuth 2" tab for your app on the [Vimeo developer site](https://developer.vimeo.com/apps).
 
+### Installation 
+
+This package is called ``PyVimeo`` on PyPI. Install using::
+
+    $ pip install PyVimeo
+
 ### Authenticating
 
 There are two main types of authentication in the Vimeo API:
