@@ -21,7 +21,7 @@ except NameError:
 class AuthorizationCodeMixin(AuthenticationMixinBase):
     """Implement helpers for the Authorization Code grant for OAuth2."""
 
-    def auth_url(self, scope, redirect):
+    def auth_url(self, scope, redirect, state):
         """Get the url to direct a user to authenticate."""
         url = self.API_ROOT + "/oauth/authorize?"
 
@@ -38,6 +38,9 @@ class AuthorizationCodeMixin(AuthenticationMixinBase):
 
         if redirect:
             query['redirect_uri'] = redirect
+
+        if state:
+            query['state'] = state
 
         return url + urlencode(query)
 
