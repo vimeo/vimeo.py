@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 
 import os
+import io
 import requests.exceptions
 
 
@@ -42,7 +43,7 @@ class UploadVideoMixin(object):
         target = ticket['upload_link']
         size = os.path.getsize(filename)
         last_byte = 0
-        with open(filename) as f:
+        with io.open(filename, 'rb') as f:
             while last_byte < size:
                 try:
                     self._make_pass(target, f, size, last_byte)
@@ -115,7 +116,7 @@ class UploadPictureMixin(object):
 
         picture = picture.json()
 
-        with open(filename) as f:
+        with io.open(filename, 'rb') as f:
             upload_resp = self.put(picture['link'], data=f)
         assert upload_resp.status_code == 200, "Failed uploading"
 
@@ -146,7 +147,7 @@ class UploadTexttrackMixin(object):
 
         texttrack = texttrack.json()
 
-        with open(filename) as f:
+        with io.open(filename, 'rb') as f:
             upload_resp = self.put(texttrack['link'], data=f)
         assert upload_resp.status_code == 200, "Failed uploading"
 
