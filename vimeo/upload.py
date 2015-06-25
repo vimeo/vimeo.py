@@ -7,6 +7,10 @@ import os
 import io
 import requests.exceptions
 
+try:
+    basestring
+except NameError:
+    basestring = str
 
 class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
