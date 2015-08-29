@@ -18,22 +18,38 @@ class UploadVideoMixin(object):
     UPLOAD_ENDPOINT = '/me/videos'
     REPLACE_ENDPOINT = '{video_uri}/files'
 
-    def upload(self, filename, upgrade_to_1080=False):
-        """Upload the named file to Vimeo."""
+    def get_ticket_upload(self, upgrade_to_1080=False):
+        """Get ticket for use in handlers to check progress update video."""
+        print('UPLOAD')
         ticket = self.post(self.UPLOAD_ENDPOINT,
             data={'type': 'streaming',
                 'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+                
+        return ticket
+    
+    def get_ticket_replace(self, video_uri, upgrade_to_1080=False):
+        """Get ticket for use in handlers to check progress replace video."""
+        
+        uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
+        print('REPLACE')
+        ticket = self.put(uri,
+            data={'type': 'streaming',
+                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+               
+        return ticket
+
+    def upload(self, filename, upgrade_to_1080=False):
+        """Upload the named file to Vimeo."""
+        
+        ticket = self.get_ticket_upload(upgrade_to_1080)
 
         return self._perform_upload(filename, ticket)
 
     def replace(self, video_uri, filename, upgrade_to_1080=False):
         """Replace the video at the given uri with the named source file."""
-        uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
-        ticket = self.put(uri,
-            data={'type': 'streaming',
-                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
-
+        ticket = self.get_ticket_replace(video_uri, upgrade_to_1080)
+        
         return self._perform_upload(filename, ticket)
 
     def _perform_upload(self, filename, ticket):
