@@ -8,9 +8,9 @@ This is a simple library for interacting with the [Vimeo API](https://developers
 import vimeo
 
 v = vimeo.VimeoClient(
-    token=YOUR_AUTHENTICATED_BEARER_TOKEN,
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    token=YOUR_ACCESS_TOKEN,
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 # Make the request to the server for the "/me" endpoint.
 about_me = v.get('/me')
@@ -43,8 +43,8 @@ Retrieving a set of client credentials in this library is very, very easy.  You 
 
 ```python
 v = vimeo.VimeoClient(
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 try:
     token = v.load_client_credentials()
@@ -65,8 +65,8 @@ This can be done with this library using some basic helper functions.  The code 
 ```python
 """This section is used to determine where to direct the user."""
 v = vimeo.VimeoClient(
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 vimeo_authorization_url = v.auth_url(['public', 'private'], 'https://example.com')
 
@@ -76,8 +76,8 @@ vimeo_authorization_url = v.auth_url(['public', 'private'], 'https://example.com
 ```python
 """This section completes the authentication for the user."""
 v = vimeo.VimeoClient(
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 # You should retrieve the "code" from the URL string Vimeo redirected to.  Here that's named CODE_FROM_URL
 try:
@@ -96,8 +96,8 @@ Once you have an authenticated instance of the `VimeoClient` class, uploading is
 
 ```python
 v = vimeo.VimeoClient(
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 video_uri = v.upload('your-filename.mp4')
 ```
@@ -119,8 +119,8 @@ Once you have an authenticated instance of the `VimeoClient` class, uploading a 
 
 ```python
 v = vimeo.VimeoClient(
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 v.upload_picture('/videos/12345', 'your-image.jpg', activate=True)
 ```
@@ -133,8 +133,8 @@ Once you have an authenticated instance of the `VimeoClient` class, uploading a 
 
 ```python
 v = vimeo.VimeoClient(
-    key=YOUR_API_TOKEN,
-    secret=YOUR_TOKEN_SECRET)
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
 
 v.upload_texttrack('/videos/12345', 'captions', 'en-US', 'your-texttrack.vtt')
 ```
