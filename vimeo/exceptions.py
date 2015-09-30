@@ -17,7 +17,7 @@ class BaseVimeoException(Exception):
         self.message = message
 
         # HTTP status code
-        self.error_code = request.status_code
+        self.status_code = request.status_code
 
         super(BaseVimeoException, self).__init__(self.message)
 
