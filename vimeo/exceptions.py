@@ -7,11 +7,14 @@ class BaseVimeoException(Exception):
 
         json = None
         try:
-            json = request.json() 
+            message = request.json()
         except:
             pass
+            
         if json:
-            message = json['error'] 
+            message = json['error']
+        else:
+            message = request.text
 
         # API error message
         self.message = message
