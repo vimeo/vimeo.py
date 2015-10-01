@@ -6,6 +6,7 @@ from __future__ import absolute_import
 import os
 import io
 import requests.exceptions
+from .exceptions import *
 
 try:
     basestring
@@ -21,8 +22,8 @@ class UploadVideoMixin(object):
     def upload(self, filename, upgrade_to_1080=False):
         """Upload the named file to Vimeo."""
         ticket = self.post(self.UPLOAD_ENDPOINT,
-            data={'type': 'streaming',
-                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+                data={'type': 'streaming',
+                      'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         return self._perform_upload(filename, ticket)
 
@@ -32,14 +33,15 @@ class UploadVideoMixin(object):
 
         ticket = self.put(uri,
             data={'type': 'streaming',
-                'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+                  'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
 
         return self._perform_upload(filename, ticket)
 
     def _perform_upload(self, filename, ticket):
         """Take an upload ticket and perform the actual upload."""
 
-        assert ticket.status_code == 201, "Failed to create an upload ticket"
+        if ticket.status_code != 201:
+            raise VideoTicketCreationFailure(ticket, "Failed to create an upload ticket")
 
         ticket = ticket.json()
 
@@ -60,7 +62,8 @@ class UploadVideoMixin(object):
         # Perform the finalization and get the location.
         finalized_resp = self.delete(ticket['complete_uri'])
 
-        assert finalized_resp.status_code == 201, "Failed to create the video."
+        if finalized_resp.status_code != 201:
+            raise VideoCreationFailure(finalized_resp, "Failed to create the video")
 
         return finalized_resp.headers.get('Location', None)
 
@@ -92,7 +95,8 @@ class UploadVideoMixin(object):
                 'Content-Range': 'bytes: %d-%d/%d' % (last_byte, size, size)
             }, data=f)
 
-        assert response.status_code == 200, "Unexpected status code on upload."
+        if response.status_code != 200:
+            raise VideoUploadFailure(response, "Unexpected status code on upload")
 
 
 class UploadPictureMixin(object):
@@ -109,24 +113,28 @@ class UploadPictureMixin(object):
         if isinstance(obj, basestring):
             # TODO:  Add filtering down to just the picture connection field.
             obj = self.get(obj)
-            assert obj.status_code == 200, "Failed to load the target object."
+
+            if obj.status_code == 200:
+                raise ObjectLoadFailure("Failed to load the targe object")
             obj = obj.json()
 
         # Get the picture object.
         picture = self.post(obj['metadata']['connections']['pictures']['uri'])
 
-        assert picture.status_code == 201, \
-            "Failed to create a new picture with Vimeo."
+        if picture.status_code != 201:
+            raise PictureCreationFailure(picture, "Failed to create a new picture with Vimeo.")
 
         picture = picture.json()
 
         with io.open(filename, 'rb') as f:
             upload_resp = self.put(picture['link'], data=f)
-        assert upload_resp.status_code == 200, "Failed uploading"
+        if upload_resp.status_code != 200:
+            raise PictureUploadFailure(texttrack, "Failed uploading picture")
 
         if activate:
             active = self.patch(picture['uri'], data={"active": "true"})
-            assert active.status_code == 200, "Failed activating"
+            if active.status_code != 200:
+                raise PictureActivationFailure(active, "Failed activating picture")
             picture['active'] = True
 
         return picture
@@ -146,14 +154,15 @@ class UploadTexttrackMixin(object):
                                     'language': language,
                                     'name': name})
 
-        assert texttrack.status_code == 201, \
-            "Failed to create a new texttrack with Vimeo."
+        if texttrack.status_code != 201:
+            raise TexttrackCreationFailure(texttrack, "Failed to create a new texttrack with Vimeo")
 
         texttrack = texttrack.json()
 
         with io.open(filename, 'rb') as f:
             upload_resp = self.put(texttrack['link'], data=f)
-        assert upload_resp.status_code == 200, "Failed uploading"
+        if upload_resp.status_code != 200:
+            raise TexttrackUploadFailure(upload_resp, "Failed uploading texttrack")
 
         return texttrack
 
