@@ -41,7 +41,7 @@ class UploadVideoMixin(object):
         """Take an upload ticket and perform the actual upload."""
 
         if ticket.status_code != 201:
-            raise VideoTicketCreationFailure(ticket, "Failed to create an upload ticket")
+            raise UploadTicketCreationFailure(ticket, "Failed to create an upload ticket")
 
         ticket = ticket.json()
 
