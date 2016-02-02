@@ -47,9 +47,23 @@ class UploadVideoMixin(object):
 
         # Perform the actual upload.
         target = ticket['upload_link']
-        size = os.path.getsize(filename)
         last_byte = 0
-        with io.open(filename, 'rb') as f:
+        # Try to get size of obj by path. If provided obj is not a file path
+        # find the size of file-like object.
+        try:
+            size = os.path.getsize(filename)
+            with io.open(filename, 'rb') as f:
+                while last_byte < size:
+                    try:
+                        self._make_pass(target, f, size, last_byte)
+                    except requests.exceptions.Timeout:
+                        # If there is a timeout here, we are okay with it, since
+                        # we'll check and resume.
+                        pass
+                    last_byte = self._get_progress(target, size)
+        except TypeError:
+            size = len(filename.read())
+            f = filename
             while last_byte < size:
                 try:
                     self._make_pass(target, f, size, last_byte)
