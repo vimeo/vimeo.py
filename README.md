@@ -92,7 +92,8 @@ This process is generally quite simple, but it does require a little more effort
 
 ### Uploading a new video
 
-Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away.  Internally, this library will provide the `streaming` upload and send a local file to the server.
+Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away.  Internally, this library will provide the `streaming` upload and send a local file to the server.  
+After a file has been uploaded, you can edit its metadata right away with `patch`.
 
 ```python
 v = vimeo.VimeoClient(
@@ -100,6 +101,8 @@ v = vimeo.VimeoClient(
     secret=YOUR_CLIENT_SECRET)
 
 video_uri = v.upload('your-filename.mp4')
+
+v.patch(video_uri, data={'name': 'Video title', 'description': '...'})
 ```
 
 ##### Replacing video source file
