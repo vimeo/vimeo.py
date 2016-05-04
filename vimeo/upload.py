@@ -128,8 +128,8 @@ class UploadPictureMixin(object):
             # TODO:  Add filtering down to just the picture connection field.
             obj = self.get(obj)
 
-            if obj.status_code == 200:
-                raise ObjectLoadFailure("Failed to load the targe object")
+            if obj.status_code != 200:
+                raise ObjectLoadFailure("Failed to load the target object")
             obj = obj.json()
 
         # Get the picture object.
