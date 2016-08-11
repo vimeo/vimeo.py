@@ -2,25 +2,25 @@
 
 
 class BaseVimeoException(Exception):
-
-    def __init__(self, request, message):
-
+    def _get_message(self, response):
         json = None
         try:
-            json = request.json()
+            json = response.json()
         except:
             pass
-            
+
         if json:
             message = json['error']
         else:
-            message = request.text
+            message = response.text
+        return message
 
+    def __init__(self, response, message):
         # API error message
-        self.message = message
+        self.message = self._get_message(response)
 
         # HTTP status code
-        self.status_code = request.status_code
+        self.status_code = response.status_code
 
         super(BaseVimeoException, self).__init__(self.message)
 
@@ -33,47 +33,65 @@ class ObjectLoadFailure(Exception):
 
 class UploadTicketCreationFailure(BaseVimeoException):
 
-    def __init__(self, request, message):
-        super(UploadTicketCreationFailure, self).__init__(request, message)
+    def __init__(self, response, message):
+        super(UploadTicketCreationFailure, self).__init__(response, message)
 
 
-class VideoCreationFailure(BaseVimeoException): 
+class VideoCreationFailure(BaseVimeoException):
 
-    def __init__(self, request, message):
-        super(VideoCreationFailure, self).__init__(request, message)
-
-
-class VideoUploadFailure(BaseVimeoException): 
-
-    def __init__(self, request, message):
-        super(VideoUploadFailure, self).__init__(request, message)
+    def __init__(self, response, message):
+        super(VideoCreationFailure, self).__init__(response, message)
 
 
-class PictureCreationFailure(BaseVimeoException): 
+class VideoUploadFailure(BaseVimeoException):
 
-    def __init__(self, request, message):
-        super(PictureCreationFailure, self).__init__(request, message)
-
-
-class PictureUploadFailure(BaseVimeoException): 
-
-    def __init__(self, request, message):
-        super(PictureUploadFailure, self).__init__(request, message)
+    def __init__(self, response, message):
+        super(VideoUploadFailure, self).__init__(response, message)
 
 
-class PictureActivationFailure(BaseVimeoException): 
+class PictureCreationFailure(BaseVimeoException):
 
-    def __init__(self, request, message):
-        super(PictureActivationFailure, self).__init__(request, message)
+    def __init__(self, response, message):
+        super(PictureCreationFailure, self).__init__(response, message)
+
+
+class PictureUploadFailure(BaseVimeoException):
+
+    def __init__(self, response, message):
+        super(PictureUploadFailure, self).__init__(response, message)
+
+
+class PictureActivationFailure(BaseVimeoException):
+
+    def __init__(self, response, message):
+        super(PictureActivationFailure, self).__init__(response, message)
 
 
 class TexttrackCreationFailure(BaseVimeoException):
 
-    def __init__(self, request, message):
-        super(TexttrackCreationFailure, self).__init__(request, message)
+    def __init__(self, response, message):
+        super(TexttrackCreationFailure, self).__init__(response, message)
 
 
 class TexttrackUploadFailure(BaseVimeoException):
 
-    def __init__(self, request, message):
-        super(TexttrackUploadFailure, self).__init__(request, message)
+    def __init__(self, response, message):
+        super(TexttrackUploadFailure, self).__init__(response, message)
+
+
+class APIRateLimitExededFailure(BaseVimeoException):
+
+    def _get_message(self, response):
+        guidelines = 'https://developer.vimeo.com/guidelines/rate-limiting'
+        message = super(APIRateLimitExededFailure, self)._get_message(
+            response
+        )
+        limit_reset_time = response.headers.get('x-ratelimit-reset')
+        if limit_reset_time:
+            text = '{} \n limit will be reseted on: {}.\n About this limit: {}'
+            message = text.format(
+                message,
+                limit_reset_time,
+                guidelines
+            )
+        return message

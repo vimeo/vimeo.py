@@ -9,6 +9,8 @@ import requests
 from .auth.client_credentials import ClientCredentialsMixin
 from .auth.authorization_code import AuthorizationCodeMixin
 from .upload import UploadMixin
+from .exceptions import APIRateLimitExededFailure
+
 
 class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     """Client handle for the Vimeo API."""
@@ -31,6 +33,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     @property
     def token(self):
         return self._token.token
+
     @token.setter
     def token(self, value):
         self._token = _BearerToken(value) if value else None
@@ -47,8 +50,9 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
         # Get the Requests based function to use to preserve their defaults.
         request_func = getattr(requests, name, None)
         if request_func is None:
-            raise AttributeError("%r could not be found in the backing lib"
-                % name)
+            raise AttributeError(
+                "%r could not be found in the backing lib" % name
+            )
 
         @wraps(request_func)
         def caller(url, jsonify=True, **kwargs):
@@ -66,15 +70,17 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
             kwargs['timeout'] = kwargs.get('timeout', (1, 30))
             kwargs['auth'] = kwargs.get('auth', self._token)
             kwargs['headers'] = headers
-
             if not url[:4] == "http":
                 url = self.API_ROOT + url
 
-            return request_func(
-                url,
-                **kwargs)
-
+            response = request_func(url, **kwargs)
+            if response.status_code == 429:
+                raise APIRateLimitExededFailure(
+                    response, 'Too many API requests'
+                )
+            return response
         return caller
+
 
 class _BearerToken(requests.auth.AuthBase):
     """Model the bearer token and apply it to the request."""
