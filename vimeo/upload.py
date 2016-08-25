@@ -105,7 +105,7 @@ class UploadVideoMixin(object):
             upload_target,
             timeout=None,
             headers={
-                'Content-Length': size,
+                'Content-Length': str(size),
                 'Content-Range': 'bytes: %d-%d/%d' % (last_byte, size, size)
             }, data=f)
 
