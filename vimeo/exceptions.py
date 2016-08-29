@@ -88,7 +88,7 @@ class APIRateLimitExededFailure(BaseVimeoException):
         )
         limit_reset_time = response.headers.get('x-ratelimit-reset')
         if limit_reset_time:
-            text = '{} \n limit will be reseted on: {}.\n About this limit: {}'
+            text = '{} \n limit will reset on: {}.\n About this limit: {}'
             message = text.format(
                 message,
                 limit_reset_time,
