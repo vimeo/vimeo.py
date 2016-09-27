@@ -79,7 +79,7 @@ class TexttrackUploadFailure(BaseVimeoException):
         super(TexttrackUploadFailure, self).__init__(response, message)
 
 
-class APIRateLimitExededFailure(BaseVimeoException):
+class APIRateLimitExceededFailure(BaseVimeoException):
 
     def _get_message(self, response):
         guidelines = 'https://developer.vimeo.com/guidelines/rate-limiting'
