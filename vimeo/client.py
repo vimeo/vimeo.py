@@ -9,7 +9,7 @@ import requests
 from .auth.client_credentials import ClientCredentialsMixin
 from .auth.authorization_code import AuthorizationCodeMixin
 from .upload import UploadMixin
-from .exceptions import APIRateLimitExededFailure
+from .exceptions import APIRateLimitExceededFailure
 
 
 class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
@@ -75,7 +75,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
 
             response = request_func(url, **kwargs)
             if response.status_code == 429:
-                raise APIRateLimitExededFailure(
+                raise APIRateLimitExceededFailure(
                     response, 'Too many API requests'
                 )
             return response
