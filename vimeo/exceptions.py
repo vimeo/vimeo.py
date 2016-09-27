@@ -83,7 +83,7 @@ class APIRateLimitExceededFailure(BaseVimeoException):
 
     def _get_message(self, response):
         guidelines = 'https://developer.vimeo.com/guidelines/rate-limiting'
-        message = super(APIRateLimitExededFailure, self)._get_message(
+        message = super(APIRateLimitExceededFailure, self)._get_message(
             response
         )
         limit_reset_time = response.headers.get('x-ratelimit-reset')
