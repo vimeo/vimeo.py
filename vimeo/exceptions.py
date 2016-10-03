@@ -10,7 +10,7 @@ class BaseVimeoException(Exception):
             pass
 
         if json:
-            message = json['error']
+            message = json.get('error') or json.get('Description')
         else:
             message = response.text
         return message

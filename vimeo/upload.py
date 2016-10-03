@@ -143,7 +143,7 @@ class UploadPictureMixin(object):
         with io.open(filename, 'rb') as f:
             upload_resp = self.put(picture['link'], data=f)
         if upload_resp.status_code != 200:
-            raise PictureUploadFailure(texttrack, "Failed uploading picture")
+            raise PictureUploadFailure(upload_resp, "Failed uploading picture")
 
         if activate:
             active = self.patch(picture['uri'], data={"active": "true"})
