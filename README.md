@@ -1,5 +1,8 @@
 # PyVimeo
 
+[![License](https://img.shields.io/pypi/l/PyVimeo.svg?style=flat-square)](https://pypi.python.org/pypi/PyVimeo/)
+[![Development Version](https://img.shields.io/pypi/v/PyVimeo.svg?style=flat-square)](https://pypi.python.org/pypi/PyVimeo/)
+
 This is a simple library for interacting with the [Vimeo API](https://developers.vimeo.com).
 
 ### Example Usage
@@ -20,7 +23,7 @@ print about_me.json()   # Load the body's JSON data.
 
 ```
 
-Note:  You can find the app tokens and an authenticated bearer token in the "OAuth 2" tab for your app on the [Vimeo developer site](https://developer.vimeo.com/apps).
+Note: You can find the app tokens and an authenticated bearer token in the "OAuth 2" tab for your app on the [Vimeo developer site](https://developer.vimeo.com/apps).
 
 ### Installation 
 
@@ -32,14 +35,14 @@ This package is called ``PyVimeo`` on PyPI. Install using::
 
 There are two main types of authentication in the Vimeo API:
 
-0. Client Credentials: A token that is specific to your app and NOT a user.
-0. Authorization Code: A token that is for your app, but has the ability to act on behalf of the authorizing user.
+1. Client Credentials: A token that is specific to your app and NOT a user.
+2. Authorization Code: A token that is for your app, but has the ability to act on behalf of the authorizing user.
 
 Note:  Both types of authentication require you go to the [Vimeo developer site](https://developer.vimeo.com/apps) and register an application with Vimeo.
 
 #### Client Credentials
 
-Retrieving a set of client credentials in this library is very, very easy.  You must provide the `VimeoClient` with the `key` and `secret` for your app, and make a single call.  The example below contains all the necessary steps.  At the end of it, the `VimeoClient` instance (the variable `v`) will be authenticated with the token, and you can store the value - returned by the `load_client_credentials()` call - in your database or a file to use like the example at the start of this README.
+Retrieving a set of client credentials in this library is very, very easy. You must provide the `VimeoClient` with the `key` and `secret` for your app, and make a single call. The example below contains all the necessary steps. At the end of it, the `VimeoClient` instance (the variable `v`) will be authenticated with the token, and you can store the value - returned by the `load_client_credentials()` call - in your database or a file to use like the example at the start of this README.
 
 ```python
 v = vimeo.VimeoClient(
@@ -54,13 +57,13 @@ except vimeo.auth.GrantFailed:
 
 #### Authorization Code
 
-Getting a bearer token via the authorization code method is a bit more complicated.  The most important thing to understand is that we need to go through a series of basic steps:
+Getting a bearer token via the authorization code method is a bit more complicated. The most important thing to understand is that we need to go through a series of basic steps:
 
-0. We send the user to a web page where they can choose to accept or reject the permissions we are asking for.
-0. When the user makes their selection and accepts or rejects your app, the user is redirected to a webpage specified by you.
-0. If the user authorized your app, you can exchange the code provided for the bearer token.
+1. We send the user to a web page where they can choose to accept or reject the permissions we are asking for.
+2. When the user makes their selection and accepts or rejects your app, the user is redirected to a webpage specified by you.
+3. If the user authorized your app, you can exchange the code provided for the bearer token.
 
-This can be done with this library using some basic helper functions.  The code below demonstrates, but do note that there are 2 sections, where you redirect the user to Vimeo, and where the user returns so you can perform the final step.
+This can be done with this library using some basic helper functions. The code below demonstrates, but do note that there are 2 sections, where you redirect the user to Vimeo, and where the user returns so you can perform the final step.
 
 ```python
 """This section is used to determine where to direct the user."""
@@ -88,11 +91,12 @@ except vimeo.auth.GrantFailed:
 # Store the token, scope and any additional user data you require in your database so users do not have to re-authorize your application repeatedly.
 ```
 
-This process is generally quite simple, but it does require a little more effort than the client credentials grant to make work properly.  Remember that you may ask for scopes that the user decides *not* to give you, and your application must gracefully handle that.
+This process is generally quite simple, but it does require a little more effort than the client credentials grant to make work properly. Remember that you may ask for scopes that the user decides *not* to give you, and your application must gracefully handle that.
 
 ### Uploading a new video
 
-Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away.  Internally, this library will provide the `streaming` upload and send a local file to the server.  
+Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away. Internally, this library will provide the `streaming` upload and send a local file to the server.
+
 After a file has been uploaded, you can edit its metadata right away with `patch`.
 
 ```python
@@ -128,7 +132,7 @@ v = vimeo.VimeoClient(
 v.upload_picture('/videos/12345', 'your-image.jpg', activate=True)
 ```
 
-Note:  This will make it the active picture for all users this way.  The `activate` keyword argument defaults to `False`, so without it you will need to activate the picture yourself.
+Note: This will make it the active picture for all users this way. The `activate` keyword argument defaults to `False`, so without it you will need to activate the picture yourself.
 
 ### Uploading a text track
 
@@ -144,4 +148,4 @@ v.upload_texttrack('/videos/12345', 'captions', 'en-US', 'your-texttrack.vtt')
 
 # Legacy Python Library
 
-An earlier version of this library used a more complicated ORM syntax.  This library is still available from this github repo via the [orm-tornado](https://github.com/vimeo/vimeo.py/releases/tag/orm-tornado) tag.
+An earlier version of this library used a more complicated ORM syntax. This library is still available from this github repo via the [orm-tornado](https://github.com/vimeo/vimeo.py/releases/tag/orm-tornado) tag.
