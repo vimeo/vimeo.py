@@ -1,12 +1,18 @@
-# PyVimeo
+PyVimeo
+===
 
-[![License](https://img.shields.io/pypi/l/PyVimeo.svg?style=flat-square)](https://pypi.python.org/pypi/PyVimeo/)
 [![Development Version](https://img.shields.io/pypi/v/PyVimeo.svg?style=flat-square)](https://pypi.python.org/pypi/PyVimeo/)
+[![License](https://img.shields.io/pypi/l/PyVimeo.svg?style=flat-square)](https://pypi.python.org/pypi/PyVimeo/)
 
 This is a simple library for interacting with the [Vimeo API](https://developers.vimeo.com).
 
-### Example Usage
+## Installation
 
+This package is called [PyVimeo](https://pypi.python.org/pypi/PyVimeo/) on PyPI. Install using:
+
+    $ pip install PyVimeo
+
+## Usage
 ```python
 import vimeo
 
@@ -20,25 +26,18 @@ about_me = v.get('/me')
 
 assert about_me.status_code == 200  # Make sure we got back a successful response.
 print about_me.json()   # Load the body's JSON data.
-
 ```
 
-Note: You can find the app tokens and an authenticated bearer token in the "OAuth 2" tab for your app on the [Vimeo developer site](https://developer.vimeo.com/apps).
+*Note: You can find the app tokens and an authenticated bearer token in the "OAuth2" tab for your app on the [Vimeo developer site](https://developer.vimeo.com/apps).*
 
-### Installation 
-
-This package is called ``PyVimeo`` on PyPI. Install using::
-
-    $ pip install PyVimeo
-
-### Authenticating
+### Authentication
 
 There are two main types of authentication in the Vimeo API:
 
-1. Client Credentials: A token that is specific to your app and NOT a user.
+1. Client Credentials: A token that is specific to your app and **not** a user.
 2. Authorization Code: A token that is for your app, but has the ability to act on behalf of the authorizing user.
 
-Note:  Both types of authentication require you go to the [Vimeo developer site](https://developer.vimeo.com/apps) and register an application with Vimeo.
+*Note: Both types of authentication require you go to the [Vimeo developer site](https://developer.vimeo.com/apps) and register an application with Vimeo.*
 
 #### Client Credentials
 
@@ -82,7 +81,7 @@ v = vimeo.VimeoClient(
     key=YOUR_CLIENT_ID,
     secret=YOUR_CLIENT_SECRET)
 
-# You should retrieve the "code" from the URL string Vimeo redirected to.  Here that's named CODE_FROM_URL
+# You should retrieve the "code" from the URL string Vimeo redirected to. Here, that's named `CODE_FROM_URL`.
 try:
     token, user, scope = v.exchange_code(CODE_FROM_URL, 'https://example.com')
 except vimeo.auth.GrantFailed:
@@ -109,13 +108,13 @@ video_uri = v.upload('your-filename.mp4')
 v.patch(video_uri, data={'name': 'Video title', 'description': '...'})
 ```
 
-##### Replacing video source file
+##### Replacing a video source file
 
 Once you have an authenticated instance of the `VimeoClient` class, you can also replace the source file of an existing video.
 
 ```python
 video_uri = v.replace(
-    video_uri='video_uri', 
+    video_uri='video_uri',
     filename='your-filename.mp4',
     upgrade_to_1080=False)
 ```
@@ -146,6 +145,25 @@ v = vimeo.VimeoClient(
 v.upload_texttrack('/videos/12345', 'captions', 'en-US', 'your-texttrack.vtt')
 ```
 
-# Legacy Python Library
+### Making API calls
+
+PyVimeo at its core is a wrapper for [Requests](http://docs.python-requests.org/en/master/), so you can interact with the library as you sould any other object from Requests.
+
+* **GET:** `response = v.get(uri)`, or with parameters `v.get(uri, data={...})`
+* **PATCH:** `response = v.patch(uri, data={...})`
+* **POST:** `response = v.post(uri, data={...})`
+* **DELETE:** `response = v.delete(uri)`
+
+### JSON Filtering
+
+The Vimeo API supports [JSON filtering](https://developer.vimeo.com/api/common-formats#json-filter) to let you return only the data that you need from an API call. To utilize this with PyVimeo, you can a `fields` variable into your endpoint payload, like:
+
+```python
+about_me = v.get('/me', data={"fields": "uri,name,pictures"})
+```
+
+Then with this response, you will only receive `uri`, `name`, and the `pictures` object.
+
+## Legacy Python Library
 
 An earlier version of this library used a more complicated ORM syntax. This library is still available from this github repo via the [orm-tornado](https://github.com/vimeo/vimeo.py/releases/tag/orm-tornado) tag.
