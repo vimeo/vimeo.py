@@ -156,10 +156,10 @@ PyVimeo at its core is a wrapper for [Requests](http://docs.python-requests.org/
 
 ### JSON Filtering
 
-The Vimeo API supports [JSON filtering](https://developer.vimeo.com/api/common-formats#json-filter) to let you return only the data that you need from an API call. To utilize this with PyVimeo, you can a `fields` variable into your endpoint payload, like:
+The Vimeo API supports [JSON filtering](https://developer.vimeo.com/api/common-formats#json-filter) to let you return only the data that you need from an API call. To utilize this with PyVimeo, you can add a `fields` variable into your endpoint payload, like:
 
 ```python
-about_me = v.get('/me', data={"fields": "uri,name,pictures"})
+about_me = v.get('/me', params={"fields": "uri,name,pictures"})
 ```
 
 Then with this response, you will only receive `uri`, `name`, and the `pictures` object.
