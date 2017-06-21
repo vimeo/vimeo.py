@@ -13,6 +13,7 @@ try:
 except NameError:
     basestring = str
 
+
 class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
 
@@ -21,9 +22,11 @@ class UploadVideoMixin(object):
 
     def upload(self, filename, upgrade_to_1080=False):
         """Upload the named file to Vimeo."""
-        ticket = self.post(self.UPLOAD_ENDPOINT,
-                data={'type': 'streaming',
-                      'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+        ticket = self.post(
+            self.UPLOAD_ENDPOINT,
+            data={'type': 'streaming',
+                  'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'},
+            params={'fields': 'upload_link,complete_uri'})
 
         return self._perform_upload(filename, ticket)
 
@@ -31,9 +34,11 @@ class UploadVideoMixin(object):
         """Replace the video at the given uri with the named source file."""
         uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
-        ticket = self.put(uri,
+        ticket = self.put(
+            uri,
             data={'type': 'streaming',
-                  'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'})
+                  'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'},
+            params={'fields': 'upload_link,complete_uri'})
 
         return self._perform_upload(filename, ticket)
 
@@ -118,22 +123,31 @@ class UploadPictureMixin(object):
     (video, user, etc).
     """
 
-    def upload_picture(self, obj, filename, activate=False):
+    BASE_FIELDS = set(('link', 'uri'))
+
+    def upload_picture(self, obj, filename, activate=False, fields=None):
         """Upload a picture for the object.
 
         The object (obj) can be the URI for the object or the response/parsed
         json for it.
         """
         if isinstance(obj, basestring):
-            # TODO:  Add filtering down to just the picture connection field.
-            obj = self.get(obj)
+            obj = self.get(obj, params={'fields': 'metadata.connections.pictures.uri'})
 
             if obj.status_code != 200:
                 raise ObjectLoadFailure("Failed to load the target object")
             obj = obj.json()
 
+        if isinstance(fields, basestring):
+            fields = set((field.strip() for field in fields.split(',')))
+
+        fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
+
         # Get the picture object.
-        picture = self.post(obj['metadata']['connections']['pictures']['uri'])
+        picture = self.post(
+            obj['metadata']['connections']['pictures']['uri'],
+            params={'fields': ','.join(fields)}
+        )
 
         if picture.status_code != 201:
             raise PictureCreationFailure(picture, "Failed to create a new picture with Vimeo.")
@@ -141,32 +155,46 @@ class UploadPictureMixin(object):
         picture = picture.json()
 
         with io.open(filename, 'rb') as f:
-            upload_resp = self.put(picture['link'], data=f)
+            upload_resp = self.put(
+                picture['link'],
+                data=f,
+                params={'fields': 'error'})
         if upload_resp.status_code != 200:
             raise PictureUploadFailure(upload_resp, "Failed uploading picture")
 
         if activate:
-            active = self.patch(picture['uri'], data={"active": "true"})
+            active = self.patch(
+                picture['uri'],
+                data={"active": "true"},
+                params={'fields': 'error'})
             if active.status_code != 200:
                 raise PictureActivationFailure(active, "Failed activating picture")
             picture['active'] = True
 
         return picture
 
+
 class UploadTexttrackMixin(object):
     """Functionality for uploading a texttrack to Vimeo for a video.
     """
     TEXTTRACK_ENDPOINT = '{video_uri}/texttracks'
+    BASE_FIELDS = set(('link',))
 
-    def upload_texttrack(self, video_uri, track_type, language, filename):
+    def upload_texttrack(self, video_uri, track_type, language, filename, fields=None):
         """Upload the texttrack at the given uri with the named source file."""
         uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
         name = filename.split('/')[-1]
 
+        if isinstance(fields, basestring):
+            fields = set((field.strip() for field in fields.split(',')))
+
+        fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
+
         texttrack = self.post(uri,
                               data={'type': track_type,
                                     'language': language,
-                                    'name': name})
+                                    'name': name},
+                              params={'fields': ','.join(fields)})
 
         if texttrack.status_code != 201:
             raise TexttrackCreationFailure(texttrack, "Failed to create a new texttrack with Vimeo")
