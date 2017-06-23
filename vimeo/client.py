@@ -16,7 +16,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     """Client handle for the Vimeo API."""
 
     API_ROOT = "https://api.vimeo.com"
-    HTTP_METHODS = {'head', 'get', 'post', 'put', 'patch', 'options', 'delete'}
+    HTTP_METHODS = set(('head', 'get', 'post', 'put', 'patch', 'options', 'delete'))
     ACCEPT_HEADER = "application/vnd.vimeo.*;version=3.2"
     USER_AGENT = "pyvimeo 0.1; (http://developer.vimeo.com/api/docs)"
 
