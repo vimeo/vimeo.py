@@ -18,7 +18,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     API_ROOT = "https://api.vimeo.com"
     HTTP_METHODS = set(('head', 'get', 'post', 'put', 'patch', 'options', 'delete'))
     ACCEPT_HEADER = "application/vnd.vimeo.*;version=3.2"
-    USER_AGENT = "pyvimeo 0.1; (http://developer.vimeo.com/api/docs)"
+    USER_AGENT = "pyvimeo 0.3.10; (http://developer.vimeo.com/api/docs)"
 
     def __init__(self, token=None, key=None, secret=None, *args, **kwargs):
         """Prep the handle with the authentication information."""
