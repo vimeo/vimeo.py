@@ -152,6 +152,7 @@ PyVimeo at its core is a wrapper for [Requests](http://docs.python-requests.org/
 * **GET:** `response = v.get(uri)`, or with parameters `v.get(uri, data={...})`
 * **PATCH:** `response = v.patch(uri, data={...})`
 * **POST:** `response = v.post(uri, data={...})`
+* **PUT:** `response = v.put(uri, data={...})`
 * **DELETE:** `response = v.delete(uri)`
 
 ### JSON Filtering
