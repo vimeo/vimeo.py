@@ -5,6 +5,7 @@ from __future__ import absolute_import
 
 import requests
 
+
 class AuthenticationMixinBase(object):
     """Provide core logic to the authentication mixins."""
 
@@ -15,9 +16,6 @@ class AuthenticationMixinBase(object):
         """
         assert self.app_info[0] is not None and self.app_info[1] is not None
 
-        resp = self.post(path,
-            auth=self.app_info,
-            jsonify=False,
-            data=data)
+        resp = self.post(path, auth=self.app_info, jsonify=False, data=data)
 
         return resp.status_code, resp.headers, resp.json()
