@@ -16,7 +16,8 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     """Client handle for the Vimeo API."""
 
     API_ROOT = "https://api.vimeo.com"
-    HTTP_METHODS = set(('head', 'get', 'post', 'put', 'patch', 'options', 'delete'))
+    HTTP_METHODS = set(('head', 'get', 'post', 'put', 'patch', 'options',
+                        'delete'))
     ACCEPT_HEADER = "application/vnd.vimeo.*;version=3.2"
     USER_AGENT = "pyvimeo 0.3.10; (http://developer.vimeo.com/api/docs)"
 
@@ -32,6 +33,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     # Internally we back this with an auth mechanism for Requests.
     @property
     def token(self):
+        """Get the token string from the class _BearerToken."""
         return self._token.token
 
     @token.setter
@@ -39,8 +41,8 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
         self._token = _BearerToken(value) if value else None
 
     def __getattr__(self, name):
-        """This is where we get the function for the verb that was just
-        requested.
+        """
+        Method used to get the function for the verb that was just requested.
 
         From here we can apply the authentication information we have.
         """
@@ -84,6 +86,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
 
 class _BearerToken(requests.auth.AuthBase):
     """Model the bearer token and apply it to the request."""
+
     def __init__(self, token):
         self.token = token
 

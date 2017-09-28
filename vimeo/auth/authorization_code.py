@@ -18,6 +18,7 @@ try:
 except NameError:
     basestring = str
 
+
 class AuthorizationCodeMixin(AuthenticationMixinBase):
     """Implement helpers for the Authorization Code grant for OAuth2."""
 
@@ -46,8 +47,8 @@ class AuthorizationCodeMixin(AuthenticationMixinBase):
 
     def exchange_code(self, code, redirect):
         """Perform the exchange step for the code from the redirected user."""
-        code, headers, resp = self.call_grant('/oauth/access_token',
-            {
+        code, headers, resp = self.call_grant(
+            '/oauth/access_token', {
                 "grant_type": "authorization_code",
                 "code": code,
                 "redirect_uri": redirect

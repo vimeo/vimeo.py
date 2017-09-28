@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import os
 import io
 import requests.exceptions
-from .exceptions import *
+from . import exceptions
 
 try:
     basestring
@@ -44,9 +44,9 @@ class UploadVideoMixin(object):
 
     def _perform_upload(self, filename, ticket):
         """Take an upload ticket and perform the actual upload."""
-
         if ticket.status_code != 201:
-            raise UploadTicketCreationFailure(ticket, "Failed to create an upload ticket")
+            raise exceptions.UploadTicketCreationFailure(
+                ticket, "Failed to create an upload ticket")
 
         ticket = ticket.json()
 
@@ -62,8 +62,8 @@ class UploadVideoMixin(object):
                     try:
                         self._make_pass(target, f, size, last_byte)
                     except requests.exceptions.Timeout:
-                        # If there is a timeout here, we are okay with it, since
-                        # we'll check and resume.
+                        # If there is a timeout here, we are okay with it,
+                        # since we'll check and resume.
                         pass
                     last_byte = self._get_progress(target, size)
         except TypeError:
@@ -82,7 +82,8 @@ class UploadVideoMixin(object):
         finalized_resp = self.delete(ticket['complete_uri'])
 
         if finalized_resp.status_code != 201:
-            raise VideoCreationFailure(finalized_resp, "Failed to create the video")
+            raise exceptions.VideoCreationFailure(
+                finalized_resp, "Failed to create the video")
 
         return finalized_resp.headers.get('Location', None)
 
@@ -98,7 +99,8 @@ class UploadVideoMixin(object):
         return int(last_byte)
 
     def _make_pass(self, upload_target, f, size, last_byte):
-        """Make a pass at uploading.
+        """
+        Make a pass at uploading.
 
         This particular function may do many things.  If this is a large upload
         it may terminate without having completed the upload.  This can also
@@ -115,27 +117,34 @@ class UploadVideoMixin(object):
             }, data=f)
 
         if response.status_code != 200:
-            raise VideoUploadFailure(response, "Unexpected status code on upload")
+            raise exceptions.VideoUploadFailure(
+                response, "Unexpected status code on upload")
 
 
 class UploadPictureMixin(object):
-    """Functionality for uploading a picture to Vimeo for another object
+    """
+    Class for uploading a picture to Vimeo.
+
+    Functionality for uploading a picture to Vimeo for another object
     (video, user, etc).
     """
 
     BASE_FIELDS = set(('link', 'uri'))
 
     def upload_picture(self, obj, filename, activate=False, fields=None):
-        """Upload a picture for the object.
+        """
+        Upload a picture for the object.
 
         The object (obj) can be the URI for the object or the response/parsed
         json for it.
         """
         if isinstance(obj, basestring):
-            obj = self.get(obj, params={'fields': 'metadata.connections.pictures.uri'})
+            obj = self.get(
+                obj, params={'fields': 'metadata.connections.pictures.uri'})
 
             if obj.status_code != 200:
-                raise ObjectLoadFailure("Failed to load the target object")
+                raise exceptions.ObjectLoadFailure(
+                    "Failed to load the target object")
             obj = obj.json()
 
         if isinstance(fields, basestring):
@@ -150,7 +159,8 @@ class UploadPictureMixin(object):
         )
 
         if picture.status_code != 201:
-            raise PictureCreationFailure(picture, "Failed to create a new picture with Vimeo.")
+            raise exceptions.PictureCreationFailure(
+                picture, "Failed to create a new picture with Vimeo.")
 
         picture = picture.json()
 
@@ -160,7 +170,8 @@ class UploadPictureMixin(object):
                 data=f,
                 params={'fields': 'error'})
         if upload_resp.status_code != 200:
-            raise PictureUploadFailure(upload_resp, "Failed uploading picture")
+            raise exceptions.PictureUploadFailure(
+                upload_resp, "Failed uploading picture")
 
         if activate:
             active = self.patch(
@@ -168,19 +179,21 @@ class UploadPictureMixin(object):
                 data={"active": "true"},
                 params={'fields': 'error'})
             if active.status_code != 200:
-                raise PictureActivationFailure(active, "Failed activating picture")
+                raise exceptions.PictureActivationFailure(
+                    active, "Failed activating picture")
             picture['active'] = True
 
         return picture
 
 
 class UploadTexttrackMixin(object):
-    """Functionality for uploading a texttrack to Vimeo for a video.
-    """
+    """Functionality for uploading a texttrack to Vimeo for a video."""
+
     TEXTTRACK_ENDPOINT = '{video_uri}/texttracks'
     BASE_FIELDS = set(('link',))
 
-    def upload_texttrack(self, video_uri, track_type, language, filename, fields=None):
+    def upload_texttrack(self, video_uri, track_type, language, filename,
+                         fields=None):
         """Upload the texttrack at the given uri with the named source file."""
         uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
         name = filename.split('/')[-1]
@@ -197,18 +210,21 @@ class UploadTexttrackMixin(object):
                               params={'fields': ','.join(fields)})
 
         if texttrack.status_code != 201:
-            raise TexttrackCreationFailure(texttrack, "Failed to create a new texttrack with Vimeo")
+            raise exceptions.TexttrackCreationFailure(
+                texttrack, "Failed to create a new texttrack with Vimeo")
 
         texttrack = texttrack.json()
 
         with io.open(filename, 'rb') as f:
             upload_resp = self.put(texttrack['link'], data=f)
         if upload_resp.status_code != 200:
-            raise TexttrackUploadFailure(upload_resp, "Failed uploading texttrack")
+            raise exceptions.TexttrackUploadFailure(
+                upload_resp, "Failed uploading texttrack")
 
         return texttrack
 
 
 class UploadMixin(UploadVideoMixin, UploadPictureMixin, UploadTexttrackMixin):
     """Handle uploading to the Vimeo API."""
+
     pass
