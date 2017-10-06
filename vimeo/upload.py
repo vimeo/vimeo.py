@@ -26,7 +26,8 @@ class UploadVideoMixin(object):
             self.UPLOAD_ENDPOINT,
             data={'type': 'streaming',
                   'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'},
-            params={'fields': 'upload_link,complete_uri'})
+            params={'fields': 'upload_link,complete_uri,user.upload_quota.' +
+                    'space.free'})
 
         return self._perform_upload(filename, ticket)
 
@@ -52,11 +53,15 @@ class UploadVideoMixin(object):
 
         # Perform the actual upload.
         target = ticket['upload_link']
+        free_quota = ticket['user']['upload_quota']['space']['free']
         last_byte = 0
         # Try to get size of obj by path. If provided obj is not a file path
         # find the size of file-like object.
         try:
             size = os.path.getsize(filename)
+            if size > free_quota:
+                raise exceptions.UploadQuotaExceeded(
+                    free_quota, 'Upload quota was exceeded.')
             with io.open(filename, 'rb') as f:
                 while last_byte < size:
                     try:
@@ -68,6 +73,9 @@ class UploadVideoMixin(object):
                     last_byte = self._get_progress(target, size)
         except TypeError:
             size = len(filename.read())
+            if size > free_quota:
+                raise exceptions.UploadQuotaExceeded(
+                    free_quota, 'Upload quota was exceeded.')
             f = filename
             while last_byte < size:
                 try:
