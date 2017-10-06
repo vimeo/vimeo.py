@@ -36,8 +36,21 @@ class ObjectLoadFailure(Exception):
         super(ObjectLoadFailure, self).__init__(message)
 
 
+class UploadQuotaExceeded(Exception):
+    """Exception for upload quota execeeded."""
+
+    def _get_free_space(self, num):
+        """Transform bytes in giga bytes."""
+        return 'Free space quota: %sGb' % (round((num / 1073741824.0), 1))
+
+    def __init__(self, free_quota, message):
+        """Init method for this subclass of BaseVimeoException."""
+        message = message + self._get_free_space(num=free_quota)
+        super(UploadQuotaExceeded, self).__init__(message)
+
+
 class UploadTicketCreationFailure(BaseVimeoException):
-    """Exception for upload tickt creation failure."""
+    """Exception for upload ticket creation failure."""
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
