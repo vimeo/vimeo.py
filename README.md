@@ -115,8 +115,7 @@ Once you have an authenticated instance of the `VimeoClient` class, you can also
 ```python
 video_uri = v.replace(
     video_uri='video_uri',
-    filename='your-filename.mp4',
-    upgrade_to_1080=False)
+    filename='your-filename.mp4')
 ```
 
 ### Uploading a picture
