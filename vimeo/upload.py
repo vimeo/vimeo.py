@@ -20,26 +20,26 @@ class UploadVideoMixin(object):
     UPLOAD_ENDPOINT = '/me/videos'
     REPLACE_ENDPOINT = '{video_uri}/files'
 
-    def upload(self, filename, upgrade_to_1080=False):
+    def upload(self, filename):
         """Upload the named file to Vimeo."""
         ticket = self.post(
             self.UPLOAD_ENDPOINT,
-            data={'type': 'streaming',
-                  'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'},
+
+            data={'type': 'streaming'},
             params={'fields': 'upload_link,complete_uri,user.upload_quota.' +
                     'space.free'})
 
         return self._perform_upload(filename, ticket)
 
-    def replace(self, video_uri, filename, upgrade_to_1080=False):
+    def replace(self, video_uri, filename):
         """Replace the video at the given uri with the named source file."""
         uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
         ticket = self.put(
             uri,
-            data={'type': 'streaming',
-                  'upgrade_to_1080': 'true' if upgrade_to_1080 else 'false'},
-            params={'fields': 'upload_link,complete_uri'})
+            data={'type': 'streaming'},
+            params={'fields': 'upload_link,complete_uri,user.upload_quota.' +
+                    'space.free'})
 
         return self._perform_upload(filename, ticket)
 
