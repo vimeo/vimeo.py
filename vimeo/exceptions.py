@@ -40,7 +40,7 @@ class UploadQuotaExceeded(Exception):
     """Exception for upload quota execeeded."""
 
     def _get_free_space(self, num):
-        """Transform bytes in giga bytes."""
+        """Transform bytes in gigabytes."""
         return 'Free space quota: %sGb' % (round((num / 1073741824.0), 1))
 
     def __init__(self, free_quota, message):
