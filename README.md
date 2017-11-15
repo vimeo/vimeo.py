@@ -108,6 +108,16 @@ video_uri = v.upload('your-filename.mp4')
 v.patch(video_uri, data={'name': 'Video title', 'description': '...'})
 ```
 
+This library also supports the tus upload protocol, using the [tus-python-client](https://github.com/tus/tus-py-client) to perform it. 
+
+```python
+v = vimeo.VimeoClient(
+    key=YOUR_CLIENT_ID,
+    secret=YOUR_CLIENT_SECRET)
+    
+video_uri = v.upload('your-filename.mp4', 'optional-video-file-name')
+```
+
 ##### Replacing a video source file
 
 Once you have an authenticated instance of the `VimeoClient` class, you can also replace the source file of an existing video.
