@@ -7,6 +7,7 @@ import os
 import io
 import requests.exceptions
 from . import exceptions
+from tusclient import client
 
 try:
     basestring
@@ -42,6 +43,49 @@ class UploadVideoMixin(object):
                     'space.free'})
 
         return self._perform_upload(filename, ticket)
+
+    def upload_tus(self, path, filename = None):
+        """Uploads a file through the tus protocol, calls the _perform_tus_upload
+
+        Args:
+            path (string): path on disk to the file
+            filename (string, optional): name of the video file on vimeo.com
+        """
+        if filename is None:
+            filename = path
+        tus = self.post(
+            self.UPLOAD_ENDPOINT,
+            data={
+                'type': 'tus',
+                'filename': filename,
+                'size': os.stat(path).st_size
+            },
+            params={'fields': 'upload_link'}
+        )
+        return self._perform_tus_upload(tus, path, filename)
+
+    def _perform_tus_upload(self, tus_resp, path, filename):
+        """Takes a tus url and performs the actual upload.
+
+        Args:
+            tus_resp (:obj): requests object
+            path (string): path on disk to file
+            filename (string): name of the video file on vimeo.com
+        """
+        if tus_resp.status_code != 201:
+            raise UploadTicketCreationFailure(tus, "Failed to create tus upload")
+
+        tus_resp = tus_resp.json()
+        upload_link = tus_resp.get("upload_link")
+        try:
+            with io.open(filename, 'rb') as fs:
+                tus_client = client.TusClient("https://files.tus.vimeo.com")
+                uploader = tus_client.uploader(file_stream=fs, url=upload_link)
+                uploader.upload()
+        except Exception as e:
+            print(e)
+
+        return tus_resp.get("link")
 
     def _perform_upload(self, filename, ticket):
         """Take an upload ticket and perform the actual upload."""
