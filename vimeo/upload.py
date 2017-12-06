@@ -6,8 +6,8 @@ from __future__ import absolute_import
 import os
 import io
 import requests.exceptions
-from . import exceptions
 from tusclient import client
+from . import exceptions
 
 try:
     basestring
@@ -21,125 +21,159 @@ class UploadVideoMixin(object):
     UPLOAD_ENDPOINT = '/me/videos'
     REPLACE_ENDPOINT = '{video_uri}/files'
 
-    def upload(self, filename):
-        """Upload the named file to Vimeo."""
-        ticket = self.post(
-            self.UPLOAD_ENDPOINT,
+    def upload(self, filename, **kwargs):
+        """Upload a file.
 
-            data={'type': 'streaming'},
-            params={'fields': 'upload_link,complete_uri,user.upload_quota.' +
-                    'space.free'})
+        This should be used to upload a local file. If you want a form for your
+        site to upload direct to Vimeo, you should look at the `POST
+        /me/videos` endpoint.
 
-        return self._perform_upload(filename, ticket)
+        https://developer.vimeo.com/api/endpoints/videos#POST/users/{user_id}/videos
+
+        Args:
+            filename (string): Path on disk to file
+            **kwargs: Supply a `data` dictionary for data to set to your video
+                when uploading. See the API documentation for parameters you
+                can send. This is optional.
+
+        Returns:
+            string: The Vimeo Video URI of your uploaded video.
+
+        Raises:
+            UploadAttemptCreationFailure: If we were unable to create an upload
+                attempt for you.
+            VideoUploadFailure: If unknown errors occured when uploading your
+                video.
+        """
+
+        filesize = self.__check_upload_quota(filename)
+        data = kwargs['data']
+
+        # Use JSON filtering so we only receive the data that we need to make
+        # an upload happen.
+        uri = '%s?fields=uri,upload' % self.UPLOAD_ENDPOINT
+
+        # Ignore any specified upload approach and size.
+        if 'upload' not in data:
+            data['upload'] = {
+                'approach': 'tus',
+                'size': filesize
+            }
+        else:
+            data['upload']['approach'] = 'tus'
+            data['upload']['size'] = filesize
+
+        attempt = self.post(uri, data=data, params={'fields': 'uri,upload'})
+        if attempt.status_code != 200:
+            raise exceptions.UploadAttemptCreationFailure(
+                attempt,
+                "Unable to initiate an upload attempt."
+            )
+
+        return self.__perform_tus_upload(filename, attempt)
 
     def replace(self, video_uri, filename):
-        """Replace the video at the given uri with the named source file."""
+        """Replace the source of a single Vimeo video.
+
+        https://developer.vimeo.com/api/endpoints/videos#PUT/videos/{video_id}/files
+
+        Args:
+            video_uri (string): Vimeo Video URI
+            filename (string): Path on disk to file
+        """
         uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
 
         ticket = self.put(
             uri,
             data={'type': 'streaming'},
-            params={'fields': 'upload_link,complete_uri,user.upload_quota.' +
-                    'space.free'})
-
-        return self._perform_upload(filename, ticket)
-
-    def upload_tus(self, path, filename = None):
-        """Uploads a file through the tus protocol, calls the _perform_tus_upload
-
-        Args:
-            path (string): path on disk to the file
-            filename (string, optional): name of the video file on vimeo.com
-        """
-        if filename is None:
-            filename = path
-        tus = self.post(
-            self.UPLOAD_ENDPOINT,
-            data={
-                'type': 'tus',
-                'filename': filename,
-                'size': os.stat(path).st_size
-            },
-            params={'fields': 'upload_link'}
+            params={'fields': 'upload_link,complete_uri'}
         )
-        return self._perform_tus_upload(tus, path, filename)
 
-    def _perform_tus_upload(self, tus_resp, path, filename):
-        """Takes a tus url and performs the actual upload.
+        return self.__perform_upload(filename, ticket)
+
+    def __perform_tus_upload(self, filename, attempt):
+        """Take an upload attempt and perform the actual upload via tus.
+
+        https://tus.io/
 
         Args:
-            tus_resp (:obj): requests object
+            attempt (:obj): requests object
             path (string): path on disk to file
             filename (string): name of the video file on vimeo.com
-        """
-        if tus_resp.status_code != 201:
-            raise UploadTicketCreationFailure(tus, "Failed to create tus upload")
 
-        tus_resp = tus_resp.json()
-        upload_link = tus_resp.get("upload_link")
+        Returns:
+            string: The Vimeo Video URI of your uploaded video.
+
+        Raises:
+            VideoUploadFailure: If unknown errors occured when uploading your
+                video.
+        """
+        attempt = attempt.json()
+        upload_link = attempt.get('upload').get('upload_link')
+
         try:
             with io.open(filename, 'rb') as fs:
-                tus_client = client.TusClient("https://files.tus.vimeo.com")
+                tus_client = client.TusClient('https://files.tus.vimeo.com')
                 uploader = tus_client.uploader(file_stream=fs, url=upload_link)
                 uploader.upload()
         except Exception as e:
-            print(e)
+            raise exceptions.VideoUploadFailure(
+                e,
+                'Unexpected error when uploading through tus.'
+            )
 
-        return tus_resp.get("link")
+        return attempt.get('uri')
 
-    def _perform_upload(self, filename, ticket):
+    def __perform_upload(self, filename, ticket):
         """Take an upload ticket and perform the actual upload."""
         if ticket.status_code != 201:
             raise exceptions.UploadTicketCreationFailure(
-                ticket, "Failed to create an upload ticket")
+                ticket,
+                "Failed to create an upload ticket"
+            )
 
         ticket = ticket.json()
 
         # Perform the actual upload.
         target = ticket['upload_link']
-        free_quota = ticket['user']['upload_quota']['space']['free']
+        filesize = self.__check_upload_quota(filename)
         last_byte = 0
+
         # Try to get size of obj by path. If provided obj is not a file path
         # find the size of file-like object.
         try:
-            size = os.path.getsize(filename)
-            if size > free_quota:
-                raise exceptions.UploadQuotaExceeded(
-                    free_quota, 'Upload quota was exceeded.')
             with io.open(filename, 'rb') as f:
-                while last_byte < size:
+                while last_byte < filesize:
                     try:
-                        self._make_pass(target, f, size, last_byte)
+                        self.__make_pass(target, f, filesize, last_byte)
                     except requests.exceptions.Timeout:
                         # If there is a timeout here, we are okay with it,
                         # since we'll check and resume.
                         pass
-                    last_byte = self._get_progress(target, size)
+                    last_byte = self.__get_progress(target, filesize)
         except TypeError:
-            size = len(filename.read())
-            if size > free_quota:
-                raise exceptions.UploadQuotaExceeded(
-                    free_quota, 'Upload quota was exceeded.')
             f = filename
-            while last_byte < size:
+            while last_byte < filesize:
                 try:
-                    self._make_pass(target, f, size, last_byte)
+                    self.__make_pass(target, f, filesize, last_byte)
                 except requests.exceptions.Timeout:
                     # If there is a timeout here, we are okay with it, since
                     # we'll check and resume.
                     pass
-                last_byte = self._get_progress(target, size)
+                last_byte = self.__get_progress(target, filesize)
 
         # Perform the finalization and get the location.
         finalized_resp = self.delete(ticket['complete_uri'])
 
         if finalized_resp.status_code != 201:
             raise exceptions.VideoCreationFailure(
-                finalized_resp, "Failed to create the video")
+                finalized_resp,
+                "Failed to create the video"
+            )
 
         return finalized_resp.headers.get('Location', None)
 
-    def _get_progress(self, upload_target, filesize):
+    def __get_progress(self, upload_target, filesize):
         """Test the completeness of the upload."""
         progress_response = self.put(
             upload_target,
@@ -150,7 +184,7 @@ class UploadVideoMixin(object):
 
         return int(last_byte)
 
-    def _make_pass(self, upload_target, f, size, last_byte):
+    def __make_pass(self, upload_target, f, size, last_byte):
         """
         Make a pass at uploading.
 
@@ -171,6 +205,54 @@ class UploadVideoMixin(object):
         if response.status_code != 200:
             raise exceptions.VideoUploadFailure(
                 response, "Unexpected status code on upload")
+
+    def __check_upload_quota(self, filename):
+        """
+        Check the users' upload quota and verify that we can upload what they
+        want before going through with it.
+
+        Args:
+            filename (string): Path on disk to file
+
+        Returns:
+            integer: The size of the file.
+        """
+        response = self.get('/me', params={
+            'fields': 'upload_quota.space.free'
+        })
+
+        if response.status_code != 200:
+            raise exceptions.BaseVimeoException(
+                response,
+                'Unable to pull the users upload quota.'
+            )
+
+        response = response.json()
+        free_quota = response['upload_quota']['space']['free']
+        filesize = self.__get_file_size(filename)
+
+        if filesize > free_quota:
+            raise exceptions.UploadQuotaExceeded(
+                free_quota,
+                'Upload quota was exceeded.'
+            )
+
+        return filesize
+
+    def __get_file_size(self, filename):
+        """Get the size of a specific file.
+
+        Args:
+            filename (string): Path on disk to file
+
+        Returns:
+            integer: The size of the file.
+        """
+
+        try:
+            return os.path.getsize(filename)
+        except TypeError:
+            return len(filename.read())
 
 
 class UploadPictureMixin(object):

@@ -94,28 +94,24 @@ This process is generally quite simple, but it does require a little more effort
 
 ### Uploading a new video
 
-Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away. Internally, this library will provide the `streaming` upload and send a local file to the server.
-
-After a file has been uploaded, you can edit its metadata right away with `patch`.
+Once you have an authenticated instance of the `VimeoClient` class, uploading is a single function call away with `upload`. Internally, this library will provide the `tus` upload and send a local file to the server with the [tus](https://tus.io/) upload protocol and [tus-python-client](https://github.com/tus/tus-py-client).
 
 ```python
-v = vimeo.VimeoClient(
-    key=YOUR_CLIENT_ID,
-    secret=YOUR_CLIENT_SECRET)
+video_uri = v.upload('your-filename.mp4')
+```
 
+If you wish to add metadata to your video as it's being uploaded, you can supply a `data` object to `.upload()`.
+
+```python
+video_uri = v.upload('your-filename.mp4', data={'name': 'Video title', 'description': '...'})
+```
+
+Alternatively, you can do this after the video has been uploaded with a `patch` call.
+
+```python
 video_uri = v.upload('your-filename.mp4')
 
 v.patch(video_uri, data={'name': 'Video title', 'description': '...'})
-```
-
-This library also supports the tus upload protocol, using the [tus-python-client](https://github.com/tus/tus-py-client) to perform it. 
-
-```python
-v = vimeo.VimeoClient(
-    key=YOUR_CLIENT_ID,
-    secret=YOUR_CLIENT_SECRET)
-    
-video_uri = v.upload('your-filename.mp4', 'optional-video-file-name')
 ```
 
 ##### Replacing a video source file
