@@ -19,7 +19,7 @@ class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
 
     UPLOAD_ENDPOINT = '/me/videos'
-    REPLACE_ENDPOINT = '{video_uri}/files'
+    VERSIONS_ENDPOINT = '{video_uri}/versions'
 
     def upload(self, filename, **kwargs):
         """Upload a file.
@@ -47,11 +47,8 @@ class UploadVideoMixin(object):
         """
 
         filesize = self.__check_upload_quota(filename)
-        data = kwargs['data']
-
-        # Use JSON filtering so we only receive the data that we need to make
-        # an upload happen.
-        uri = '%s?fields=uri,upload' % self.UPLOAD_ENDPOINT
+        uri = self.UPLOAD_ENDPOINT
+        data = kwargs['data'] if 'data' in kwargs else {}
 
         # Ignore any specified upload approach and size.
         if 'upload' not in data:
@@ -70,26 +67,55 @@ class UploadVideoMixin(object):
                 "Unable to initiate an upload attempt."
             )
 
+        attempt = attempt.json()
+
         return self.__perform_tus_upload(filename, attempt)
 
-    def replace(self, video_uri, filename):
+    def replace(self, video_uri, filename, **kwargs):
         """Replace the source of a single Vimeo video.
 
-        https://developer.vimeo.com/api/endpoints/videos#PUT/videos/{video_id}/files
+        https://developer.vimeo.com/api/endpoints/videos#POST/videos/{video_id}/versions
 
         Args:
             video_uri (string): Vimeo Video URI
             filename (string): Path on disk to file
+            **kwargs: Supply a `data` dictionary for data to set to your video
+                when uploading. See the API documentation for parameters you
+                can send. This is optional.
+
+        Returns:
+            string: The Vimeo Video URI of your replaced video.
         """
-        uri = self.REPLACE_ENDPOINT.format(video_uri=video_uri)
+        filesize = self.__check_upload_quota(filename)
+        uri = self.VERSIONS_ENDPOINT.format(video_uri=video_uri)
 
-        ticket = self.put(
-            uri,
-            data={'type': 'streaming'},
-            params={'fields': 'upload_link,complete_uri'}
-        )
+        data = kwargs['data'] if 'data' in kwargs else {}
+        data['file_name'] = os.path.basename(filename)
 
-        return self.__perform_upload(filename, ticket)
+        # Ignore any specified upload approach and size.
+        if 'upload' not in data:
+            data['upload'] = {
+                'approach': 'tus',
+                'size': filesize
+            }
+        else:
+            data['upload']['approach'] = 'tus'
+            data['upload']['size'] = filesize
+
+        attempt = self.post(uri, data=data, params={'fields': 'upload'})
+        if attempt.status_code != 201:
+            raise exceptions.UploadAttemptCreationFailure(
+                attempt,
+                "Unable to initiate an upload attempt."
+            )
+
+        attempt = attempt.json()
+
+        # `uri` doesn't come back from `/videos/:id/versions` so we need to
+        # manually set it here for uploading.
+        attempt['uri'] = video_uri
+
+        return self.__perform_tus_upload(filename, attempt)
 
     def __perform_tus_upload(self, filename, attempt):
         """Take an upload attempt and perform the actual upload via tus.
@@ -108,7 +134,6 @@ class UploadVideoMixin(object):
             VideoUploadFailure: If unknown errors occured when uploading your
                 video.
         """
-        attempt = attempt.json()
         upload_link = attempt.get('upload').get('upload_link')
 
         try:
@@ -123,88 +148,6 @@ class UploadVideoMixin(object):
             )
 
         return attempt.get('uri')
-
-    def __perform_upload(self, filename, ticket):
-        """Take an upload ticket and perform the actual upload."""
-        if ticket.status_code != 201:
-            raise exceptions.UploadTicketCreationFailure(
-                ticket,
-                "Failed to create an upload ticket"
-            )
-
-        ticket = ticket.json()
-
-        # Perform the actual upload.
-        target = ticket['upload_link']
-        filesize = self.__check_upload_quota(filename)
-        last_byte = 0
-
-        # Try to get size of obj by path. If provided obj is not a file path
-        # find the size of file-like object.
-        try:
-            with io.open(filename, 'rb') as f:
-                while last_byte < filesize:
-                    try:
-                        self.__make_pass(target, f, filesize, last_byte)
-                    except requests.exceptions.Timeout:
-                        # If there is a timeout here, we are okay with it,
-                        # since we'll check and resume.
-                        pass
-                    last_byte = self.__get_progress(target, filesize)
-        except TypeError:
-            f = filename
-            while last_byte < filesize:
-                try:
-                    self.__make_pass(target, f, filesize, last_byte)
-                except requests.exceptions.Timeout:
-                    # If there is a timeout here, we are okay with it, since
-                    # we'll check and resume.
-                    pass
-                last_byte = self.__get_progress(target, filesize)
-
-        # Perform the finalization and get the location.
-        finalized_resp = self.delete(ticket['complete_uri'])
-
-        if finalized_resp.status_code != 201:
-            raise exceptions.VideoCreationFailure(
-                finalized_resp,
-                "Failed to create the video"
-            )
-
-        return finalized_resp.headers.get('Location', None)
-
-    def __get_progress(self, upload_target, filesize):
-        """Test the completeness of the upload."""
-        progress_response = self.put(
-            upload_target,
-            headers={'Content-Range': 'bytes */*'})
-
-        range_recv = progress_response.headers.get('Range', None)
-        _, last_byte = range_recv.split('-')
-
-        return int(last_byte)
-
-    def __make_pass(self, upload_target, f, size, last_byte):
-        """
-        Make a pass at uploading.
-
-        This particular function may do many things.  If this is a large upload
-        it may terminate without having completed the upload.  This can also
-        occur if there are network issues or any other interruptions.  These
-        can be recovered from by checking with the server to see how much it
-        has and resuming the connection.
-        """
-        response = self.put(
-            upload_target,
-            timeout=None,
-            headers={
-                'Content-Length': str(size),
-                'Content-Range': 'bytes: %d-%d/%d' % (last_byte, size, size)
-            }, data=f)
-
-        if response.status_code != 200:
-            raise exceptions.VideoUploadFailure(
-                response, "Unexpected status code on upload")
 
     def __check_upload_quota(self, filename):
         """
