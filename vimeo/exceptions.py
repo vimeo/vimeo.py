@@ -4,26 +4,33 @@
 class BaseVimeoException(Exception):
     """Base class for Vimeo Exceptions."""
 
-    def _get_message(self, response):
+    def __get_message(self, response):
+        if type(response) is Exception:
+            return response.message
+
         json = None
         try:
             json = response.json()
-        except:
+        except Exception:
             pass
 
         if json:
             message = json.get('error') or json.get('Description')
         else:
             message = response.text
+
         return message
 
     def __init__(self, response, message):
         """Base Exception class init."""
         # API error message
-        self.message = self._get_message(response)
+        self.message = self.__get_message(response)
 
         # HTTP status code
-        self.status_code = response.status_code
+        if type(response) is Exception:
+            self.status_code = 500
+        else:
+            self.status_code = response.status_code
 
         super(BaseVimeoException, self).__init__(self.message)
 
@@ -39,14 +46,22 @@ class ObjectLoadFailure(Exception):
 class UploadQuotaExceeded(Exception):
     """Exception for upload quota execeeded."""
 
-    def _get_free_space(self, num):
+    def __get_free_space(self, num):
         """Transform bytes in gigabytes."""
         return 'Free space quota: %sGb' % (round((num / 1073741824.0), 1))
 
     def __init__(self, free_quota, message):
         """Init method for this subclass of BaseVimeoException."""
-        message = message + self._get_free_space(num=free_quota)
+        message = message + self.__get_free_space(num=free_quota)
         super(UploadQuotaExceeded, self).__init__(message)
+
+
+class UploadAttemptCreationFailure(BaseVimeoException):
+    """Exception for upload attempt creation failure."""
+
+    def __init__(self, response, message):
+        """Init method for this subclass of BaseVimeoException."""
+        super(UploadAttemptCreationFailure, self).__init__(response, message)
 
 
 class UploadTicketCreationFailure(BaseVimeoException):
@@ -116,9 +131,9 @@ class TexttrackUploadFailure(BaseVimeoException):
 class APIRateLimitExceededFailure(BaseVimeoException):
     """Exception used when the user has exceeded the API rate limit."""
 
-    def _get_message(self, response):
+    def __get_message(self, response):
         guidelines = 'https://developer.vimeo.com/guidelines/rate-limiting'
-        message = super(APIRateLimitExceededFailure, self)._get_message(
+        message = super(APIRateLimitExceededFailure, self).__get_message(
             response
         )
         limit_reset_time = response.headers.get('x-ratelimit-reset')
