@@ -27,7 +27,6 @@ There is a lot of information about the Vimeo API at <https://developer.vimeo.co
 ## Direct Help
 
  * [Stack Overflow](http://stackoverflow.com/questions/tagged/vimeo-api)
- * [Google Group](https://groups.google.com/forum/#!forum/vimeo-api)
  * [Vimeo Support](https://vimeo.com/help/contact)
 
 ## Installation
