@@ -21,7 +21,7 @@ class UploadVideoMixin(object):
     UPLOAD_ENDPOINT = '/me/videos'
     VERSIONS_ENDPOINT = '{video_uri}/versions'
 
-    def upload(self, filename, **kwargs):
+    def upload(self, filename, data=None, tus_uploader_config=None):
         """Upload a file.
 
         This should be used to upload a local file. If you want a form for your
@@ -31,10 +31,15 @@ class UploadVideoMixin(object):
         https://developer.vimeo.com/api/endpoints/videos#POST/users/{user_id}/videos
 
         Args:
-            filename (string): Path on disk to file
-            **kwargs: Supply a `data` dictionary for data to set to your video
-                when uploading. See the API documentation for parameters you
-                can send. This is optional.
+            filename (string): Path on disk to file.
+            data (dict): Information about the video, such as name and
+                description. See the API documentation for parameters you can
+                send. This is optional.
+            tus_uploader_config (dict): An optional configuration dictionary
+                which will be passed to the tusclient uploader. For details,
+                see the documentation of the Uploader class in the
+                tusclient.uploader module. Potentially useful settings
+                include `chunk_size`, `retries`, and `log_func`.
 
         Returns:
             string: The Vimeo Video URI of your uploaded video.
@@ -48,7 +53,8 @@ class UploadVideoMixin(object):
 
         filesize = self.__check_upload_quota(filename)
         uri = self.UPLOAD_ENDPOINT
-        data = kwargs['data'] if 'data' in kwargs else {}
+        if data is None:
+            data = {}
 
         # Ignore any specified upload approach and size.
         if 'upload' not in data:
@@ -69,9 +75,9 @@ class UploadVideoMixin(object):
 
         attempt = attempt.json()
 
-        return self.__perform_tus_upload(filename, attempt)
+        return self.__perform_tus_upload(filename, attempt, tus_uploader_config)
 
-    def replace(self, video_uri, filename, **kwargs):
+    def replace(self, video_uri, filename, data=None, tus_uploader_config=None):
         """Replace the source of a single Vimeo video.
 
         https://developer.vimeo.com/api/endpoints/videos#POST/videos/{video_id}/versions
@@ -79,17 +85,23 @@ class UploadVideoMixin(object):
         Args:
             video_uri (string): Vimeo Video URI
             filename (string): Path on disk to file
-            **kwargs: Supply a `data` dictionary for data to set to your video
-                when uploading. See the API documentation for parameters you
-                can send. This is optional.
+            data (dict): Information about the video, such as name and
+                description. See the API documentation for parameters you can
+                send. This is optional.
+            tus_uploader_config (dict): An optional configuration dictionary
+                which will be passed to the tusclient uploader. For details,
+                see the documentation of the Uploader class in the
+                tusclient.uploader module. Potentially useful settings
+                include `chunk_size`, `retries`, and `log_func`.
 
         Returns:
             string: The Vimeo Video URI of your replaced video.
         """
         filesize = self.__check_upload_quota(filename)
         uri = self.VERSIONS_ENDPOINT.format(video_uri=video_uri)
+        if data is None:
+            data = {}
 
-        data = kwargs['data'] if 'data' in kwargs else {}
         data['file_name'] = os.path.basename(filename)
 
         # Ignore any specified upload approach and size.
@@ -115,9 +127,9 @@ class UploadVideoMixin(object):
         # manually set it here for uploading.
         attempt['uri'] = video_uri
 
-        return self.__perform_tus_upload(filename, attempt)
+        return self.__perform_tus_upload(filename, attempt, tus_uploader_config)
 
-    def __perform_tus_upload(self, filename, attempt):
+    def __perform_tus_upload(self, filename, attempt, config):
         """Take an upload attempt and perform the actual upload via tus.
 
         https://tus.io/
@@ -126,6 +138,7 @@ class UploadVideoMixin(object):
             attempt (:obj): requests object
             path (string): path on disk to file
             filename (string): name of the video file on vimeo.com
+            config (dict or None): settings for the tus uploader
 
         Returns:
             string: The Vimeo Video URI of your uploaded video.
@@ -135,11 +148,18 @@ class UploadVideoMixin(object):
                 video.
         """
         upload_link = attempt.get('upload').get('upload_link')
+        if config is None:
+            config = {}
+        # Prevent unwanted overrides
+        for k in ('file_stream', 'url'):
+            if k in config:
+                del config[k]
 
         try:
             with io.open(filename, 'rb') as fs:
                 tus_client = client.TusClient('https://files.tus.vimeo.com')
-                uploader = tus_client.uploader(file_stream=fs, url=upload_link)
+                uploader = tus_client.uploader(
+                    file_stream=fs, url=upload_link, **config)
                 uploader.upload()
         except Exception as e:
             raise exceptions.VideoUploadFailure(
