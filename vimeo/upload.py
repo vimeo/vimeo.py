@@ -46,7 +46,7 @@ class UploadVideoMixin(object):
                 video.
         """
 
-        filesize = self.__check_upload_quota(filename)
+        filesize = self.__get_file_size(filename)
         uri = self.UPLOAD_ENDPOINT
         data = kwargs['data'] if 'data' in kwargs else {}
 
@@ -86,7 +86,7 @@ class UploadVideoMixin(object):
         Returns:
             string: The Vimeo Video URI of your replaced video.
         """
-        filesize = self.__check_upload_quota(filename)
+        filesize = self.__get_file_size(filename)
         uri = self.VERSIONS_ENDPOINT.format(video_uri=video_uri)
 
         data = kwargs['data'] if 'data' in kwargs else {}
@@ -148,39 +148,6 @@ class UploadVideoMixin(object):
             )
 
         return attempt.get('uri')
-
-    def __check_upload_quota(self, filename):
-        """
-        Check the users' upload quota and verify that we can upload what they
-        want before going through with it.
-
-        Args:
-            filename (string): Path on disk to file
-
-        Returns:
-            integer: The size of the file.
-        """
-        response = self.get('/me', params={
-            'fields': 'upload_quota.space.free'
-        })
-
-        if response.status_code != 200:
-            raise exceptions.BaseVimeoException(
-                response,
-                'Unable to pull the users upload quota.'
-            )
-
-        response = response.json()
-        free_quota = response['upload_quota']['space']['free']
-        filesize = self.__get_file_size(filename)
-
-        if filesize > free_quota:
-            raise exceptions.UploadQuotaExceeded(
-                free_quota,
-                'Upload quota was exceeded.'
-            )
-
-        return filesize
 
     def __get_file_size(self, filename):
         """Get the size of a specific file.
