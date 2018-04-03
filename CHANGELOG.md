@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.1] - 2018-04-03
+## Changed
+- Uploads no longer make a pre-emptive request to check the user's quota. This check is done automatically when making a POST to `/me/videos`. ([#118](https://github.com/vimeo/vimeo.py/pull/118))
+
 ## [1.0.0] - 2018-02-06
 ### Changed
 - Moving API requests over to use API v3.4. ([#111](https://github.com/vimeo/vimeo.py/pull/111))
@@ -77,6 +81,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.1]: https://github.com/vimeo/vimeo.py/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/vimeo/vimeo.py/compare/0.4.1...1.0.0
 [0.4.1]: https://github.com/vimeo/vimeo.py/compare/0.4.0...0.4.1
 [0.4.0]: https://github.com/vimeo/vimeo.py/compare/0.3.10...0.4.0
