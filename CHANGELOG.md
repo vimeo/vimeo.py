@@ -1,4 +1,7 @@
 # Changelog
+## [1.0.2] - 2018-05-07
+## Fixed
+- Downgraded our `tuspy` requirement to lock it at 0.2.1. ([#119](https://github.com/vimeo/vimeo.py/issues/119))
 
 ## [1.0.1] - 2018-04-03
 ## Changed
@@ -81,6 +84,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.2]: https://github.com/vimeo/vimeo.py/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/vimeo/vimeo.py/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/vimeo/vimeo.py/compare/0.4.1...1.0.0
 [0.4.1]: https://github.com/vimeo/vimeo.py/compare/0.4.0...0.4.1
