@@ -16,8 +16,13 @@ class BaseVimeoException(Exception):
 
         if json:
             message = json.get('error') or json.get('Description')
-        else:
+        elif hasattr(response, 'text'):
             message = response.text
+        elif hasattr(response, 'message'):
+            # this condition e.g. applies when propagating a Tusclient exception
+            message = response.message
+        else:
+            message = u'Unknown error: ' + repr(response)
 
         return message
 
