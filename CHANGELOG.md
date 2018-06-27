@@ -1,10 +1,14 @@
 # Changelog
+## [1.0.3] - 2018-06-27
+### Fixed
+- Fixing a bug where non-SDK exceptions would throw fatal exceptions. ([#122](https://github.com/vimeo/vimeo.py/issues/122))
+
 ## [1.0.2] - 2018-05-07
-## Fixed
+### Fixed
 - Downgraded our `tuspy` requirement to lock it at 0.2.1. ([#119](https://github.com/vimeo/vimeo.py/issues/119))
 
 ## [1.0.1] - 2018-04-03
-## Changed
+### Changed
 - Uploads no longer make a pre-emptive request to check the user's quota. This check is done automatically when making a POST to `/me/videos`. ([#118](https://github.com/vimeo/vimeo.py/pull/118))
 
 ## [1.0.0] - 2018-02-06
@@ -84,6 +88,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.3]: https://github.com/vimeo/vimeo.py/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/vimeo/vimeo.py/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/vimeo/vimeo.py/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/vimeo/vimeo.py/compare/0.4.1...1.0.0
