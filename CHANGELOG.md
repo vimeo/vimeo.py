@@ -1,4 +1,8 @@
 # Changelog
+## [1.0.5] - 2018-07-16
+## Changed
+- Changed the Tus retry work added in [1.0.4] to use the native `retries` parameter within the Tus uploader. ([#127](https://github.com/vimeo/vimeo.py/pull/127))
+
 ## [1.0.4] - 2018-07-16
 ## Added
 - Tus uploads will now retry up to a number of 3 times if failures occur. ([#126](https://github.com/vimeo/vimeo.py/pull/126))
@@ -92,6 +96,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.5]: https://github.com/vimeo/vimeo.py/compare/1.0.4...1.0.5
 [1.0.4]: https://github.com/vimeo/vimeo.py/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/vimeo/vimeo.py/compare/1.0.2...1.0.3
 [1.0.2]: https://github.com/vimeo/vimeo.py/compare/1.0.1...1.0.2
