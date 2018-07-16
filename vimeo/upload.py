@@ -7,7 +7,6 @@ import io
 import os
 import requests.exceptions
 from . import exceptions
-from time import sleep
 from tusclient import client
 
 try:
@@ -120,7 +119,6 @@ class UploadVideoMixin(object):
 
     def __perform_tus_upload(self, filename, attempt):
         """Take an upload attempt and perform the actual upload via tus.
-        Upon encountering an error/exception will attempt retries (3) with an exponential cooldown.
         https://tus.io/
 
         Args:
@@ -136,23 +134,20 @@ class UploadVideoMixin(object):
                 video.
         """
         upload_link = attempt.get('upload').get('upload_link')
-        failures = 0
-        max_failures = 3
 
-        while failures < max_failures:
-            try:
-                with io.open(filename, 'rb') as fs:
-                    tus_client = client.TusClient('https://files.tus.vimeo.com')
-                    uploader = tus_client.uploader(file_stream=fs, url=upload_link)
-                    uploader.upload()
-            except Exception as e:
-                failures += 1
-                if failures >= max_failures:
-                    raise exceptions.VideoUploadFailure(
-                        e,
-                        'Unexpected error when uploading through tus.'
-                    )
-                sleep(pow(4, failures))
+        try:
+            with io.open(filename, 'rb') as fs:
+                tus_client = client.TusClient('https://files.tus.vimeo.com')
+                uploader = tus_client.uploader(
+                    file_stream=fs,
+                    url=upload_link,
+                    retries=3)
+                uploader.upload()
+        except Exception as e:
+            raise exceptions.VideoUploadFailure(
+                e,
+                'Unexpected error when uploading through tus.'
+            )
 
         return attempt.get('uri')
 
