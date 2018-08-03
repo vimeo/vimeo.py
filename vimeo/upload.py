@@ -20,6 +20,7 @@ class UploadVideoMixin(object):
 
     UPLOAD_ENDPOINT = '/me/videos'
     VERSIONS_ENDPOINT = '{video_uri}/versions'
+    DEFAULT_CHUNK_SIZE = (200 * 1024 * 1024)  # 200 MB
 
     def upload(self, filename, **kwargs):
         """Upload a file.
@@ -50,6 +51,11 @@ class UploadVideoMixin(object):
         uri = self.UPLOAD_ENDPOINT
         data = kwargs['data'] if 'data' in kwargs else {}
 
+        # Is a `chunk_size` specified? Use default value if not.
+        proposed_or_default_chunk_size = data.get('chunk_size', self.DEFAULT_CHUNK_SIZE)
+        # For efficiency, lets ensure the pending chunk_size does not result in too many cycles
+        chunk_size = self.apply_chunk_size_rules(proposed_or_default_chunk_size, filesize)
+
         # Ignore any specified upload approach and size.
         if 'upload' not in data:
             data['upload'] = {
@@ -69,7 +75,7 @@ class UploadVideoMixin(object):
 
         attempt = attempt.json()
 
-        return self.__perform_tus_upload(filename, attempt)
+        return self.__perform_tus_upload(filename, attempt, chunk_size=chunk_size)
 
     def replace(self, video_uri, filename, **kwargs):
         """Replace the source of a single Vimeo video.
@@ -117,14 +123,14 @@ class UploadVideoMixin(object):
 
         return self.__perform_tus_upload(filename, attempt)
 
-    def __perform_tus_upload(self, filename, attempt):
+    def __perform_tus_upload(self, filename, attempt, chunk_size=DEFAULT_CHUNK_SIZE):
         """Take an upload attempt and perform the actual upload via tus.
         https://tus.io/
 
         Args:
-            attempt (:obj): requests object
-            path (string): path on disk to file
             filename (string): name of the video file on vimeo.com
+            attempt (:obj): requests object
+            chunk_size (int): size of each chunk. defaults to DEFAULT_CHUNK_SIZE
 
         Returns:
             string: The Vimeo Video URI of your uploaded video.
@@ -139,9 +145,10 @@ class UploadVideoMixin(object):
             with io.open(filename, 'rb') as fs:
                 tus_client = client.TusClient('https://files.tus.vimeo.com')
                 uploader = tus_client.uploader(
+                    chunk_size=chunk_size,
                     file_stream=fs,
-                    url=upload_link,
-                    retries=3)
+                    retries=3,
+                    url=upload_link)
                 uploader.upload()
         except Exception as e:
             raise exceptions.VideoUploadFailure(
@@ -150,6 +157,27 @@ class UploadVideoMixin(object):
             )
 
         return attempt.get('uri')
+
+    @staticmethod
+    def apply_chunk_size_rules(self, proposed_chunk_size, file_size):
+        """
+        Enforces the notion that a User may supply any `proposed_chunk_size`, as long as it results in 1024 or less
+        proposed chunks. In the event it does not, then the "chunk_size" becomes the file_size divided by 1024.
+
+        Args:
+            proposed_chunk_size (int): chunk size in bytes
+            file_size (int): the size of the file to be uploaded, in bytes
+
+        Returns:
+            int:
+        """
+        chunks = file_size // proposed_chunk_size
+        divides_evenly = file_size % proposed_chunk_size == 0
+        number_of_chunks_proposed = chunks if divides_evenly else chunks + 1
+
+        if number_of_chunks_proposed > 1024:
+            return (file_size // 1024) + 1
+        return proposed_chunk_size
 
     def __get_file_size(self, filename):
         """Get the size of a specific file.
