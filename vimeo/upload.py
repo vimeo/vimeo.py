@@ -98,6 +98,11 @@ class UploadVideoMixin(object):
         data = kwargs['data'] if 'data' in kwargs else {}
         data['file_name'] = os.path.basename(filename)
 
+        # Is a `chunk_size` specified? Use default value if not.
+        proposed_or_default_chunk_size = data.get('chunk_size', self.DEFAULT_CHUNK_SIZE)
+        # For efficiency, lets ensure the pending chunk_size does not result in too many cycles
+        chunk_size = self.apply_chunk_size_rules(proposed_or_default_chunk_size, filesize)
+
         # Ignore any specified upload approach and size.
         if 'upload' not in data:
             data['upload'] = {
@@ -121,7 +126,7 @@ class UploadVideoMixin(object):
         # manually set it here for uploading.
         attempt['uri'] = video_uri
 
-        return self.__perform_tus_upload(filename, attempt)
+        return self.__perform_tus_upload(filename, attempt, chunk_size=chunk_size)
 
     def __perform_tus_upload(self, filename, attempt, chunk_size=DEFAULT_CHUNK_SIZE):
         """Take an upload attempt and perform the actual upload via tus.
@@ -159,7 +164,7 @@ class UploadVideoMixin(object):
         return attempt.get('uri')
 
     @staticmethod
-    def apply_chunk_size_rules(self, proposed_chunk_size, file_size):
+    def apply_chunk_size_rules(proposed_chunk_size, file_size):
         """
         Enforces the notion that a User may supply any `proposed_chunk_size`, as long as it results in 1024 or less
         proposed chunks. In the event it does not, then the "chunk_size" becomes the file_size divided by 1024.
@@ -171,6 +176,8 @@ class UploadVideoMixin(object):
         Returns:
             int:
         """
+        proposed_chunk_size = 1 if proposed_chunk_size <= 0 else proposed_chunk_size
+
         chunks = file_size // proposed_chunk_size
         divides_evenly = file_size % proposed_chunk_size == 0
         number_of_chunks_proposed = chunks if divides_evenly else chunks + 1
