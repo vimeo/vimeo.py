@@ -1,4 +1,8 @@
 # Changelog
+## [1.0.6] - 2018-08-16
+## Added
+- Added support for dynamic Tus chunk sizes. ([#130](https://github.com/vimeo/vimeo.py/pull/130))
+
 ## [1.0.5] - 2018-07-16
 ## Changed
 - Changed the Tus retry work added in [1.0.4] to use the native `retries` parameter within the Tus uploader. ([#127](https://github.com/vimeo/vimeo.py/pull/127))
@@ -96,6 +100,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.6]: https://github.com/vimeo/vimeo.py/compare/1.0.5...1.0.6
 [1.0.5]: https://github.com/vimeo/vimeo.py/compare/1.0.4...1.0.5
 [1.0.4]: https://github.com/vimeo/vimeo.py/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/vimeo/vimeo.py/compare/1.0.2...1.0.3
