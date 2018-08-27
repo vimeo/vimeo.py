@@ -16,9 +16,11 @@ class BaseVimeoException(Exception):
 
         if json:
             message = json.get('error') or json.get('Description')
-        else:
+        elif hasattr(response, 'text'):
             response_message = getattr(response, 'message', 'There was an unexpected error.')
             message = getattr(response, 'text', response_message)
+        else:
+            message = getattr(response, 'message')
 
         return message
 
