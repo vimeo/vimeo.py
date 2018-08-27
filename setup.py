@@ -14,7 +14,7 @@ setup(name='PyVimeo',
     author_email='support@vimeo.com',
     license='Apache License, Version 2.0, January 2004',
     packages=['vimeo', 'vimeo/auth'],
-    install_requires=['requests>=2.4.0', 'tuspy==0.2.1'],
+    install_requires=['requests>=2.4.0', 'tuspy>=0.2.1'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
