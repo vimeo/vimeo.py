@@ -32,8 +32,10 @@ class BaseVimeoException(Exception):
         # HTTP status code
         if type(response) is Exception:
             self.status_code = 500
-        else:
+        elif hasattr(response, 'status_code'):
             self.status_code = response.status_code
+        else:
+            self.status_code = 500
 
         super(BaseVimeoException, self).__init__(self.message)
 
