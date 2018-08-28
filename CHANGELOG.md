@@ -1,4 +1,8 @@
 # Changelog
+## [1.0.8] - 2018-08-28
+## Fixed
+- Added some more handling for non-Vimeo exceptions. ([#134](https://github.com/vimeo/vimeo.py/issues/134))
+
 ## [1.0.7] - 2018-08-27
 ## Changed
 - Updated our requirement for tuspy. ([#131](https://github.com/vimeo/vimeo.py/issues/131))
@@ -104,6 +108,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.8]: https://github.com/vimeo/vimeo.py/compare/1.0.7...1.0.8
 [1.0.7]: https://github.com/vimeo/vimeo.py/compare/1.0.6...1.0.7
 [1.0.6]: https://github.com/vimeo/vimeo.py/compare/1.0.5...1.0.6
 [1.0.5]: https://github.com/vimeo/vimeo.py/compare/1.0.4...1.0.5
