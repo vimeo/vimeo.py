@@ -1,26 +1,30 @@
 # Changelog
+## [1.0.10] - 2018-12-05
+### Changed
+- Updated the "Development Status" classifier in the package to stable.
+
 ## [1.0.9] - 2018-09-07
-## Changed
+### Changed
 - Downgraded our tuspu requirement. ([#136](https://github.com/vimeo/vimeo.py/pull/136))
 
 ## [1.0.8] - 2018-08-28
-## Fixed
+### Fixed
 - Added some more handling for non-Vimeo exceptions. ([#134](https://github.com/vimeo/vimeo.py/issues/134))
 
 ## [1.0.7] - 2018-08-27
-## Changed
+### Changed
 - Updated our requirement for tuspy. ([#131](https://github.com/vimeo/vimeo.py/issues/131))
 
 ## [1.0.6] - 2018-08-16
-## Added
+### Added
 - Added support for dynamic Tus chunk sizes. ([#130](https://github.com/vimeo/vimeo.py/pull/130))
 
 ## [1.0.5] - 2018-07-16
-## Changed
+### Changed
 - Changed the Tus retry work added in [1.0.4] to use the native `retries` parameter within the Tus uploader. ([#127](https://github.com/vimeo/vimeo.py/pull/127))
 
 ## [1.0.4] - 2018-07-16
-## Added
+### Added
 - Tus uploads will now retry up to a number of 3 times if failures occur. ([#126](https://github.com/vimeo/vimeo.py/pull/126))
 
 ## [1.0.3] - 2018-06-27
@@ -112,6 +116,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.10]: https://github.com/vimeo/vimeo.py/compare/1.0.9...1.0.10
 [1.0.9]: https://github.com/vimeo/vimeo.py/compare/1.0.8...1.0.9
 [1.0.8]: https://github.com/vimeo/vimeo.py/compare/1.0.7...1.0.8
 [1.0.7]: https://github.com/vimeo/vimeo.py/compare/1.0.6...1.0.7

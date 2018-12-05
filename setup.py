@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='PyVimeo',
-    version='1.0.9',
+    version='1.0.10',
     description='Simple interaction with the Vimeo API.',
     long_description=long_description,
     long_description_content_type="text/markdown",
