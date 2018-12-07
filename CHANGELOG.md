@@ -1,11 +1,15 @@
 # Changelog
+## [1.0.11] - 2018-12-07
+### Fixed
+- Removed some README changes to `setup.py`.
+
 ## [1.0.10] - 2018-12-05
 ### Changed
 - Updated the "Development Status" classifier in the package to stable.
 
 ## [1.0.9] - 2018-09-07
 ### Changed
-- Downgraded our tuspu requirement. ([#136](https://github.com/vimeo/vimeo.py/pull/136))
+- Downgraded our tuspy requirement. ([#136](https://github.com/vimeo/vimeo.py/pull/136))
 
 ## [1.0.8] - 2018-08-28
 ### Fixed
@@ -116,6 +120,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.0.11]: https://github.com/vimeo/vimeo.py/compare/1.0.10...1.0.11
 [1.0.10]: https://github.com/vimeo/vimeo.py/compare/1.0.9...1.0.10
 [1.0.9]: https://github.com/vimeo/vimeo.py/compare/1.0.8...1.0.9
 [1.0.8]: https://github.com/vimeo/vimeo.py/compare/1.0.7...1.0.8
