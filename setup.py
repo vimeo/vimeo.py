@@ -13,7 +13,7 @@ setup(name='PyVimeo',
     author='Vimeo',
     author_email='support@vimeo.com',
     packages=['vimeo', 'vimeo/auth'],
-    install_requires=['requests>=2.4.0', 'tuspy==0.2.1'],
+    install_requires=['requests>=2.4.0', 'tuspy==0.2.4'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
