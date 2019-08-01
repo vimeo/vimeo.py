@@ -37,7 +37,7 @@ class BaseVimeoException(Exception):
         else:
             self.status_code = 500
 
-        super(BaseVimeoException, self).__init__(self.message)
+        super().__init__(self.message)
 
 
 class ObjectLoadFailure(Exception):
@@ -45,7 +45,7 @@ class ObjectLoadFailure(Exception):
 
     def __init__(self, message):
         """Object Load failure exception init."""
-        super(ObjectLoadFailure, self).__init__(message)
+        super().__init__(message)
 
 
 class UploadQuotaExceeded(Exception):
@@ -58,7 +58,7 @@ class UploadQuotaExceeded(Exception):
     def __init__(self, free_quota, message):
         """Init method for this subclass of BaseVimeoException."""
         message = message + self.__get_free_space(num=free_quota)
-        super(UploadQuotaExceeded, self).__init__(message)
+        super().__init__(message)
 
 
 class UploadAttemptCreationFailure(BaseVimeoException):
@@ -66,7 +66,7 @@ class UploadAttemptCreationFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(UploadAttemptCreationFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class UploadTicketCreationFailure(BaseVimeoException):
@@ -74,7 +74,7 @@ class UploadTicketCreationFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(UploadTicketCreationFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class VideoCreationFailure(BaseVimeoException):
@@ -82,7 +82,7 @@ class VideoCreationFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(VideoCreationFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class VideoUploadFailure(BaseVimeoException):
@@ -90,7 +90,7 @@ class VideoUploadFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(VideoUploadFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class PictureCreationFailure(BaseVimeoException):
@@ -98,7 +98,7 @@ class PictureCreationFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(PictureCreationFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class PictureUploadFailure(BaseVimeoException):
@@ -106,7 +106,7 @@ class PictureUploadFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(PictureUploadFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class PictureActivationFailure(BaseVimeoException):
@@ -114,7 +114,7 @@ class PictureActivationFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(PictureActivationFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class TexttrackCreationFailure(BaseVimeoException):
@@ -122,7 +122,7 @@ class TexttrackCreationFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(TexttrackCreationFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class TexttrackUploadFailure(BaseVimeoException):
@@ -130,7 +130,7 @@ class TexttrackUploadFailure(BaseVimeoException):
 
     def __init__(self, response, message):
         """Init method for this subclass of BaseVimeoException."""
-        super(TexttrackUploadFailure, self).__init__(response, message)
+        super().__init__(response, message)
 
 
 class APIRateLimitExceededFailure(BaseVimeoException):
@@ -138,9 +138,7 @@ class APIRateLimitExceededFailure(BaseVimeoException):
 
     def __get_message(self, response):
         guidelines = 'https://developer.vimeo.com/guidelines/rate-limiting'
-        message = super(APIRateLimitExceededFailure, self).__get_message(
-            response
-        )
+        message = super().__get_message(response)
         limit_reset_time = response.headers.get('x-ratelimit-reset')
         if limit_reset_time:
             text = '{} \n limit will reset on: {}.\n About this limit: {}'

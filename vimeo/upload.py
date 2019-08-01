@@ -10,7 +10,7 @@ from . import exceptions
 from tusclient import client
 
 
-class UploadVideoMixin(object):
+class UploadVideoMixin:
     """Handle uploading a new video to the Vimeo API."""
 
     UPLOAD_ENDPOINT = '/me/videos'
@@ -197,7 +197,7 @@ class UploadVideoMixin(object):
             return len(filename.read())
 
 
-class UploadPictureMixin(object):
+class UploadPictureMixin:
     """
     Class for uploading a picture to Vimeo.
 
@@ -205,7 +205,7 @@ class UploadPictureMixin(object):
     (video, user, etc).
     """
 
-    BASE_FIELDS = set(('link', 'uri'))
+    BASE_FIELDS = {'link', 'uri'}
 
     def upload_picture(self, obj, filename, activate=False, fields=None):
         """
@@ -224,7 +224,7 @@ class UploadPictureMixin(object):
             obj = obj.json()
 
         if isinstance(fields, str):
-            fields = set((field.strip() for field in fields.split(',')))
+            fields = {field.strip() for field in fields.split(',')}
 
         fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
 
@@ -262,11 +262,11 @@ class UploadPictureMixin(object):
         return picture
 
 
-class UploadTexttrackMixin(object):
+class UploadTexttrackMixin:
     """Functionality for uploading a texttrack to Vimeo for a video."""
 
     TEXTTRACK_ENDPOINT = '{video_uri}/texttracks'
-    BASE_FIELDS = set(('link',))
+    BASE_FIELDS = {'link'}
 
     def upload_texttrack(self, video_uri, track_type, language, filename,
                          fields=None):
@@ -275,7 +275,7 @@ class UploadTexttrackMixin(object):
         name = filename.split('/')[-1]
 
         if isinstance(fields, str):
-            fields = set((field.strip() for field in fields.split(',')))
+            fields = {field.strip() for field in fields.split(',')}
 
         fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
 
