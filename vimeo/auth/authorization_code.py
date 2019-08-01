@@ -5,18 +5,8 @@ from __future__ import absolute_import
 
 from .base import AuthenticationMixinBase
 from . import GrantFailed
+from urllib.parse import urlencode
 
-# We need to get urlencode from urllib.parse in Python 3, but fall back to
-# urllib in Python 2
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-
-try:
-    basestring
-except NameError:
-    basestring = str
 
 
 class AuthorizationCodeMixin(AuthenticationMixinBase):
@@ -32,7 +22,7 @@ class AuthorizationCodeMixin(AuthenticationMixinBase):
         }
 
         if scope:
-            if not isinstance(scope, basestring):
+            if not isinstance(scope, str):
                 scope = ' '.join(scope)
 
             query['scope'] = scope

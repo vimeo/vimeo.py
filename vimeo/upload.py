@@ -9,11 +9,6 @@ import requests.exceptions
 from . import exceptions
 from tusclient import client
 
-try:
-    basestring
-except NameError:
-    basestring = str
-
 
 class UploadVideoMixin(object):
     """Handle uploading a new video to the Vimeo API."""
@@ -219,7 +214,7 @@ class UploadPictureMixin(object):
         The object (obj) can be the URI for the object or the response/parsed
         json for it.
         """
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             obj = self.get(
                 obj, params={'fields': 'metadata.connections.pictures.uri'})
 
@@ -228,7 +223,7 @@ class UploadPictureMixin(object):
                     "Failed to load the target object")
             obj = obj.json()
 
-        if isinstance(fields, basestring):
+        if isinstance(fields, str):
             fields = set((field.strip() for field in fields.split(',')))
 
         fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
@@ -279,7 +274,7 @@ class UploadTexttrackMixin(object):
         uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
         name = filename.split('/')[-1]
 
-        if isinstance(fields, basestring):
+        if isinstance(fields, str):
             fields = set((field.strip() for field in fields.split(',')))
 
         fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
