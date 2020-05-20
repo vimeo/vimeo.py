@@ -1,12 +1,8 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-from __future__ import absolute_import
 
-import requests
-
-
-class AuthenticationMixinBase(object):
+class AuthenticationMixinBase:
     """Provide core logic to the authentication mixins."""
 
     def call_grant(self, path, data):

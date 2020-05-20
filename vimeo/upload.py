@@ -1,21 +1,14 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-from __future__ import absolute_import
-
 import io
 import os
 import requests.exceptions
 from . import exceptions
 from tusclient import client
 
-try:
-    basestring
-except NameError:
-    basestring = str
 
-
-class UploadVideoMixin(object):
+class UploadVideoMixin:
     """Handle uploading a new video to the Vimeo API."""
 
     UPLOAD_ENDPOINT = '/me/videos'
@@ -202,7 +195,7 @@ class UploadVideoMixin(object):
             return len(filename.read())
 
 
-class UploadPictureMixin(object):
+class UploadPictureMixin:
     """
     Class for uploading a picture to Vimeo.
 
@@ -210,7 +203,7 @@ class UploadPictureMixin(object):
     (video, user, etc).
     """
 
-    BASE_FIELDS = set(('link', 'uri'))
+    BASE_FIELDS = {'link', 'uri'}
 
     def upload_picture(self, obj, filename, activate=False, fields=None):
         """
@@ -219,7 +212,7 @@ class UploadPictureMixin(object):
         The object (obj) can be the URI for the object or the response/parsed
         json for it.
         """
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             obj = self.get(
                 obj, params={'fields': 'metadata.connections.pictures.uri'})
 
@@ -228,8 +221,8 @@ class UploadPictureMixin(object):
                     "Failed to load the target object")
             obj = obj.json()
 
-        if isinstance(fields, basestring):
-            fields = set((field.strip() for field in fields.split(',')))
+        if isinstance(fields, str):
+            fields = {field.strip() for field in fields.split(',')}
 
         fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
 
@@ -267,11 +260,11 @@ class UploadPictureMixin(object):
         return picture
 
 
-class UploadTexttrackMixin(object):
+class UploadTexttrackMixin:
     """Functionality for uploading a texttrack to Vimeo for a video."""
 
     TEXTTRACK_ENDPOINT = '{video_uri}/texttracks'
-    BASE_FIELDS = set(('link',))
+    BASE_FIELDS = {'link'}
 
     def upload_texttrack(self, video_uri, track_type, language, filename,
                          fields=None):
@@ -279,8 +272,8 @@ class UploadTexttrackMixin(object):
         uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
         name = filename.split('/')[-1]
 
-        if isinstance(fields, basestring):
-            fields = set((field.strip() for field in fields.split(',')))
+        if isinstance(fields, str):
+            fields = {field.strip() for field in fields.split(',')}
 
         fields = self.BASE_FIELDS.union(fields) if fields else self.BASE_FIELDS
 

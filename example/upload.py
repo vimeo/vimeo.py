@@ -33,7 +33,7 @@ try:
 
     # Get the metadata response from the upload and log out the Vimeo.com url
     video_data = client.get(uri + '?fields=link').json()
-    print('"%s" has been uploaded to %s' % (file_name, video_data['link']))
+    print('"{}" has been uploaded to {}'.format(file_name, video_data['link']))
 
     # Make an API call to edit the title and description of the video.
     client.patch(uri, data={
@@ -46,7 +46,7 @@ try:
 
     # Make an API call to see if the video is finished transcoding.
     video_data = client.get(uri + '?fields=transcode.status').json()
-    print('The transcode status for %s is: %s' % (
+    print('The transcode status for {} is: {}'.format(
         uri,
         video_data['transcode']['status']
     ))
