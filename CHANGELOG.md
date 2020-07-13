@@ -1,4 +1,8 @@
 # Changelog
+## [1.1.0] - 2018-05-20
+### Fixed
+- Add back missing classifiers in `setup.py`
+
 ## [1.0.11] - 2018-12-07
 ### Fixed
 - Removed some README changes to `setup.py`.
@@ -120,6 +124,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.1.0]: https://github.com/vimeo/vimeo.py/compare/1.0.11...1.1.0
 [1.0.11]: https://github.com/vimeo/vimeo.py/compare/1.0.10...1.0.11
 [1.0.10]: https://github.com/vimeo/vimeo.py/compare/1.0.9...1.0.10
 [1.0.9]: https://github.com/vimeo/vimeo.py/compare/1.0.8...1.0.9
