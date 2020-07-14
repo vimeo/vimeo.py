@@ -77,7 +77,7 @@ try:
     token = v.load_client_credentials(scope)
 
     # usable access token
-    print 'token=%s' % tkoen
+    print 'token=%s' % token
 except vimeo.auth.GrantFailed:
     # Handle the failure to get a token from the provided code and redirect.
 ```
