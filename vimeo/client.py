@@ -6,17 +6,18 @@ import json
 import requests
 from .auth.client_credentials import ClientCredentialsMixin
 from .auth.authorization_code import AuthorizationCodeMixin
+from .auth.device_code import DeviceCodeMixin
 from .upload import UploadMixin
 from .exceptions import APIRateLimitExceededFailure
 
 
-class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
+class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, DeviceCodeMixin, UploadMixin):
     """Client handle for the Vimeo API."""
 
     API_ROOT = "https://api.vimeo.com"
     HTTP_METHODS = {'head', 'get', 'post', 'put', 'patch', 'options', 'delete'}
     ACCEPT_HEADER = "application/vnd.vimeo.*;version=3.4"
-    USER_AGENT = "pyvimeo 1.0.11; (http://developer.vimeo.com/api/docs)"
+    USER_AGENT = "pyvimeo 1.2.0; (http://developer.vimeo.com/api/docs)"
 
     def __init__(self, token=None, key=None, secret=None, *args, **kwargs):
         """Prep the handle with the authentication information."""

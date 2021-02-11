@@ -4,7 +4,7 @@
 from setuptools import setup
 
 setup(name='PyVimeo',
-    version='1.1.0',
+    version='1.2.0',
     description='Simple interaction with the Vimeo API.',
     url='https://developer.vimeo.com/',
     author='Vimeo',
