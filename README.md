@@ -132,7 +132,7 @@ This process is straightforward in theory, but it does require a little more eff
 
 PyVimeo at its core is a wrapper for [Requests](http://docs.python-requests.org/en/master/), so you can interact with the library as you would any other object from Requests.
 
-* **GET:** `response = v.get(uri)`, or with parameters `v.get(uri, data={...})`
+* **GET:** `response = v.get(uri)`, or with parameters `v.get(uri, params={...})`
 * **PATCH:** `response = v.patch(uri, data={...})`
 * **POST:** `response = v.post(uri, data={...})`
 * **PUT:** `response = v.put(uri, data={...})`
