@@ -6,7 +6,8 @@ class BaseVimeoException(Exception):
 
     def __get_message(self, response):
         if type(response) is Exception:
-            return response.message
+            default_message = 'There was an unexpected error'
+            return response.message if response.message is not None else default_message
 
         json = None
         try:
@@ -14,12 +15,13 @@ class BaseVimeoException(Exception):
         except Exception:
             pass
 
+        message = None
         if json:
             message = json.get('error') or json.get('Description')
         elif hasattr(response, 'text'):
             response_message = getattr(response, 'message', 'There was an unexpected error.')
             message = getattr(response, 'text', response_message)
-        else:
+        elif hasattr(response, 'message')::
             message = getattr(response, 'message')
 
         return message
