@@ -21,7 +21,7 @@ class BaseVimeoException(Exception):
         elif hasattr(response, 'text'):
             response_message = getattr(response, 'message', 'There was an unexpected error.')
             message = getattr(response, 'text', response_message)
-        elif hasattr(response, 'message')::
+        elif hasattr(response, 'message'):
             message = getattr(response, 'message')
 
         return message
