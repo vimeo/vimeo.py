@@ -38,6 +38,7 @@ class UploadVideoMixin:
                 attempt for you.
             VideoUploadFailure: If unknown errors occured when uploading your
                 video.
+            Exception: If another error occured while uploading your video.
         """
 
         filesize = self.__get_file_size(filename)
