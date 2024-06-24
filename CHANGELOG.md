@@ -1,5 +1,12 @@
 # Changelog
-## [1.1.0] - 2018-05-20
+## [1.2.0] - 2021-02-12
+### Added
+- Added support for device-code authorization
+
+## [1.1.0] - 2020-05-20
+### Changed
+- Removed  Python 2.7 support
+
 ### Fixed
 - Add back missing classifiers in `setup.py`
 
@@ -124,6 +131,7 @@ additional issues are invited for full support.
 ### Added
 - First release using the Python [requests](http://docs.python-requests.org/en/latest/) module
 
+[1.2.0]: https://github.com/vimeo/vimeo.py/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/vimeo/vimeo.py/compare/1.0.11...1.1.0
 [1.0.11]: https://github.com/vimeo/vimeo.py/compare/1.0.10...1.0.11
 [1.0.10]: https://github.com/vimeo/vimeo.py/compare/1.0.9...1.0.10
