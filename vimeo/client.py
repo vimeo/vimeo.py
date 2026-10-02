@@ -30,8 +30,8 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
     # Internally we back this with an auth mechanism for Requests.
     @property
     def token(self):
-        """Get the token string from the class _BearerToken."""
-        return self._token.token
+        """Get the token string, or None if no token is configured."""
+        return self._token.token if self._token is not None else None
 
     @token.setter
     def token(self, value):
