@@ -56,7 +56,7 @@ class VimeoClient(ClientCredentialsMixin, AuthorizationCodeMixin, UploadMixin):
         @wraps(request_func)
         def caller(url, jsonify=True, **kwargs):
             """Hand off the call to Requests."""
-            headers = kwargs.get('headers', dict())
+            headers = (kwargs.get('headers') or {}).copy()
             headers['Accept'] = self.ACCEPT_HEADER
             headers['User-Agent'] = self.USER_AGENT
 

@@ -16,6 +16,10 @@ This package is called [PyVimeo](https://pypi.python.org/pypi/PyVimeo/) on PyPI.
     pip install PyVimeo
 
 ## Advanced examples
+Custom request headers are copied before the client adds its defaults or JSON
+content type, so a headers dictionary can be reused without being modified.
+Passing `headers=None` uses the default headers.
+
 To see examples of the most common use cases of the Python library, visit our [Python Examples Library](https://developer.vimeo.com/api/libraries/examples/python).
 
 ## Legacy Python library
