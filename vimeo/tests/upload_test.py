@@ -1,4 +1,38 @@
-from vimeo.upload import UploadVideoMixin
+import sys
+from unittest.mock import Mock
+
+import pytest
+
+from vimeo.upload import UploadTexttrackMixin, UploadVideoMixin
+
+
+@pytest.mark.parametrize('path_form', ['native', 'forward_slashes', 'path'])
+def test_texttrack_uses_filename_without_directory(tmp_path, path_form):
+    if path_form == 'path' and sys.version_info < (3, 6):
+        pytest.skip('PathLike support requires Python 3.6')
+    subtitles = tmp_path / 'captions.vtt'
+    subtitles.write_bytes(b'WEBVTT\n')
+    filename = {
+        'native': str(subtitles),
+        'forward_slashes': subtitles.as_posix(),
+        'path': subtitles,
+    }[path_form]
+    upload = UploadTexttrackMixin()
+    result = {'link': 'https://example.com/upload', 'uri': '/texttracks/1'}
+    upload.post = Mock(return_value=Mock(status_code=201))
+    upload.post.return_value.json.return_value = result
+    uploaded = []
+
+    def put(url, data):
+        assert url == result['link']
+        uploaded.append(data.read())
+        return Mock(status_code=200)
+
+    upload.put = put
+    actual = upload.upload_texttrack('/videos/1', 'subtitles', 'en', filename)
+    assert actual == result
+    assert upload.post.call_args[1]['data']['name'] == 'captions.vtt'
+    assert uploaded == [b'WEBVTT\n']
 
 
 def test_apply_chunk_size_rules():

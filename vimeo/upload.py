@@ -268,9 +268,9 @@ class UploadTexttrackMixin:
 
     def upload_texttrack(self, video_uri, track_type, language, filename,
                          fields=None):
-        """Upload the texttrack at the given uri with the named source file."""
+        """Upload a texttrack, using the local file's basename as its name."""
         uri = self.TEXTTRACK_ENDPOINT.format(video_uri=video_uri)
-        name = filename.split('/')[-1]
+        name = os.path.basename(filename)
 
         if isinstance(fields, str):
             fields = {field.strip() for field in fields.split(',')}
